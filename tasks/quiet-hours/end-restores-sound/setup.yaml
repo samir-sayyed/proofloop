@@ -1,0 +1,28 @@
+# Setup for the end-alarm criterion: create the default 9:00 AM-5:00 PM Weekdays schedule (Ring 0% at start, 70% at end).
+# The runner resets app data, grants notifications and pins the clock to Wed 18 Nov 2026 08:00 before this flow.
+appId: com.sam.quiethours
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "Get Started"
+    timeout: 20000
+- tapOn: "Get Started"
+- tapOn: "Explore App"
+- tapOn: "Continue"
+- extendedWaitUntil:
+    visible: "Manage your sound profiles"
+    timeout: 10000
+- tapOn: "Add Schedule"
+- assertVisible: "Step 1 of 2"
+- tapOn: "Schedule Title"
+- inputText: "Smoke"
+- hideKeyboard
+- tapOn: "Weekdays"
+- tapOn: "Next"
+- assertVisible: "Step 2 of 2"
+- tapOn: "Activate"
+- tapOn: "Done"
+- extendedWaitUntil:
+    visible: "Manage your sound profiles"
+    timeout: 10000

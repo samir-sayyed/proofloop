@@ -1,0 +1,6 @@
+# Criterion 2 status without rebuilding Home: no reopen, no tab switch. Checks the status line refreshes on its own.
+appId: com.sam.quiethours
+---
+- extendedWaitUntil:
+    visible: "Active until 5:00 PM"
+    timeout: 10000

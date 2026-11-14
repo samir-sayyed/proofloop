@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "proofloop_version": "0.1.0",
+  "task": "quiet-hours/end-restores-sound",
+  "criterion": "A Silent schedule restores normal sound at its end time, and Home shows it active during the window and the next start after it.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/setup.yaml",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/active.yaml",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/ended.yaml"
+  ],
+  "started": "2026-11-14T20:56:08",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [
+    {
+      "reason": "status flows force-stopped the app and cancelled its END alarm",
+      "change": "launchApp stopApp: false; force-stop blocked by the flow checker"
+    }
+  ],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-e4ba3eb.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 110.0,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 109.1,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 109.1,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 4,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 112.0,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 5,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 109.8,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 6,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 110.9,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 7,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 111.5,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:02",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 8,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 125.1,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:02",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 9,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 115.7,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:02",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      },
+      {
+        "build": "good",
+        "run": 10,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 123.5,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:02",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:02",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ]
+      }
+    ],
+    "required": 10,
+    "passes": 10,
+    "flake_upper_bound_95": 0.2588655508930523
+  },
+  "bugs": [
+    {
+      "name": "end-hour-late",
+      "role": "proof",
+      "expect": "E2",
+      "caught": true,
+      "result": {
+        "build": "end-hour-late",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E2",
+        "step": "probe E2",
+        "error": "expected normal, read {'time': '17:01:00', 'ringer': 'NORMAL', 'zen': '1', 'ring': '4', 'state': 'quiet'}",
+        "environment": false,
+        "seconds": 168.8,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:01:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          }
+        ]
+      }
+    },
+    {
+      "name": "pre-fix-72587d5",
+      "role": "proof",
+      "expect": "E1s",
+      "caught": true,
+      "result": {
+        "build": "pre-fix-72587d5",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E1s",
+        "step": "active.yaml:6 extendedWaitUntil",
+        "error": "Assertion is false: \"Active until 5:00 PM\" is visible",
+        "environment": false,
+        "seconds": 99.3,
+        "evidence": ".scratch/proofloop/eval-out/run2-prefix/pre-fix-72587d5-1/step7-active/2026-11-14_211917/active",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          }
+        ]
+      }
+    },
+    {
+      "name": "end-5min-early",
+      "role": "held_out",
+      "expect": null,
+      "caught": true,
+      "result": {
+        "build": "end-5min-early",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E2",
+        "step": "probe E2",
+        "error": "expected normal, read {'time': '17:01:00', 'ringer': 'NORMAL', 'zen': '1', 'ring': '4', 'state': 'quiet'}",
+        "environment": false,
+        "seconds": 165.3,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:01:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          }
+        ]
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5554",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64"
+  },
+  "approved_by": "samirsayyed, 2026-11-14 (first-criterion grilling, E1-E2; status checks added by agent)",
+  "verdict": "proven",
+  "reason": "passed 10/10; every proof bug failed at its expected checkpoint",
+  "seconds": 1577.3,
+  "failure_label": "none"
+}

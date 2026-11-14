@@ -1,0 +1,13 @@
+diff --git a/app/src/main/java/com/google/samples/apps/sunflower/viewmodels/PlantAndGardenPlantingsViewModel.kt b/app/src/main/java/com/google/samples/apps/sunflower/viewmodels/PlantAndGardenPlantingsViewModel.kt
+index 9a3d0dc..a7fec26 100644
+--- a/app/src/main/java/com/google/samples/apps/sunflower/viewmodels/PlantAndGardenPlantingsViewModel.kt
++++ b/app/src/main/java/com/google/samples/apps/sunflower/viewmodels/PlantAndGardenPlantingsViewModel.kt
+@@ -36,6 +36,6 @@ class PlantAndGardenPlantingsViewModel(plantings: PlantAndGardenPlantings) {
+         get() = plant.plantId
+ 
+     companion object {
+-        private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.US)
++        private val dateFormat = SimpleDateFormat("MMM D, yyyy", Locale.US)
+     }
+ }
+\ No newline at end of file

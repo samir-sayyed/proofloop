@@ -1,0 +1,20 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  fast-tests:
+    # Fake device and fake Maestro; no emulator, no model calls. Runs in about a second.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      - run: pip install -e . && proofloop check tasks/quiet-hours/weekdays-listed/task.json && proofloop check tasks/quiet-hours/end-restores-sound/task.json
+# Real-emulator evals need the seeded-bug APKs and a KVM host, so they run on demand on a
+# self-hosted runner or locally: `proofloop eval tasks/` (see README, "Evals").

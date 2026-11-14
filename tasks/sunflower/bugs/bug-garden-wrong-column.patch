@@ -1,0 +1,13 @@
+diff --git a/app/src/main/java/com/google/samples/apps/sunflower/data/GardenPlantingDao.kt b/app/src/main/java/com/google/samples/apps/sunflower/data/GardenPlantingDao.kt
+index ca7f6ce..6f39f00 100644
+--- a/app/src/main/java/com/google/samples/apps/sunflower/data/GardenPlantingDao.kt
++++ b/app/src/main/java/com/google/samples/apps/sunflower/data/GardenPlantingDao.kt
+@@ -39,7 +39,7 @@ interface GardenPlantingDao {
+      * the object mapping.
+      */
+     @Transaction
+-    @Query("SELECT * FROM plants WHERE id IN (SELECT DISTINCT(plant_id) FROM garden_plantings)")
++    @Query("SELECT * FROM plants WHERE id IN (SELECT DISTINCT(id) FROM garden_plantings)")
+     fun getPlantedGardens(): Flow<List<PlantAndGardenPlantings>>
+ 
+     @Insert

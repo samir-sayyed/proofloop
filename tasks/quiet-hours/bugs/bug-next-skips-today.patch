@@ -1,0 +1,11 @@
+--- a/app/src/main/java/com/sam/quiethours/presentation/home/components/ScheduleStatus.kt	2026-11-14 17:26:46
++++ b/app/src/main/java/com/sam/quiethours/presentation/home/components/ScheduleStatus.kt	2026-11-14 17:26:46
+@@ -50,7 +50,7 @@
+ /** Future start only; saving during an existing window does not prove it is running. */
+ fun nextScheduleStart(schedule: VolumeSchedule, now: LocalDateTime = LocalDateTime.now()): LocalDateTime? {
+     val start = schedule.startTime ?: return null
+-    for (offset in 0L..7L) {
++    for (offset in 1L..7L) {
+         val date = now.toLocalDate().plusDays(offset)
+         if (date.dayOfWeek.value % 7 !in schedule.days) continue
+         val occurrenceStart = LocalDateTime.of(date, start)

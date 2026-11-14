@@ -1,0 +1,35 @@
+# Criterion: a Weekdays schedule appears on Home with its title, "Weekdays", and the correct next start.
+# The runner resets app data, grants notifications and pins the clock to Wed 18 Nov 2026 08:00 before this flow.
+appId: com.sam.quiethours
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "Get Started"
+    timeout: 20000
+- tapOn: "Get Started"
+- tapOn: "Explore App"
+- tapOn: "Continue"
+- extendedWaitUntil:
+    visible: "Manage your sound profiles"
+    timeout: 10000
+- tapOn: "Add Schedule"
+# checkpoint: C1 the wizard opens from "Add Schedule"
+- assertVisible: "Step 1 of 2"
+- tapOn: "Schedule Title"
+- inputText: "Smoke"
+- hideKeyboard
+- tapOn: "Weekdays"
+- tapOn: "Next"
+- assertVisible: "Step 2 of 2"
+- tapOn: "Activate"
+- tapOn: "Done"
+- extendedWaitUntil:
+    visible: "Manage your sound profiles"
+    timeout: 10000
+# checkpoint: C2 the title is listed on Home
+- assertVisible: "Smoke"
+# checkpoint: C3 the day summary reads "Weekdays"
+- assertVisible: "Weekdays"
+# checkpoint: C4 the status shows the right next start
+- assertVisible: "Next: Today 9:00 AM"

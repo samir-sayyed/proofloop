@@ -1,0 +1,11 @@
+# Criterion 2, E1 status. Home caches its status line while composed, so switch tabs to rebuild it.
+# Never force-stop here: force-stop cancels the app's pending alarms, including the END alarm under test.
+appId: com.sam.quiethours
+---
+- launchApp:
+    stopApp: false
+- tapOn: "Meetings"
+- tapOn: "Home"
+- extendedWaitUntil:
+    visible: "Active until 5:00 PM"
+    timeout: 10000

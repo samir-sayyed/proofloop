@@ -1,0 +1,28 @@
+# Criterion: adding a plant to the garden lists it on the My garden tab with today's planting date.
+# The runner resets app data and pins the clock to Wed 18 Nov 2026 10:00 before this flow.
+appId: com.google.samples.apps.sunflower
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "Plant list"
+    timeout: 20000
+- tapOn: "Plant list"
+# The plant list is seeded from assets by a background worker on first launch.
+- extendedWaitUntil:
+    visible: "Avocado"
+    timeout: 20000
+- tapOn: "Avocado"
+# checkpoint: C1 the plant's detail screen opens
+- assertVisible: "Watering needs"
+- assertVisible: "every 3 days"
+- tapOn: "Add plant"
+- tapOn: "Navigate up"
+- tapOn: "My garden"
+# checkpoint: C2 the plant is listed on My garden
+- extendedWaitUntil:
+    visible: "Planted"
+    timeout: 10000
+- assertVisible: "Avocado"
+# checkpoint: C3 the planting date is today
+- assertVisible: "Nov 18, 2026"

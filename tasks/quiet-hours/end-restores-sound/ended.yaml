@@ -1,0 +1,8 @@
+# Home status, read without reopening the app (requires Quiet Hours e4ba3eb or later, which refreshes it).
+# Never force-stop here: that cancels the pending END alarm under test.
+appId: com.sam.quiethours
+---
+# checkpoint: E2s Home status after the end
+- extendedWaitUntil:
+    visible: "Next: Tomorrow 9:00 AM"
+    timeout: 15000

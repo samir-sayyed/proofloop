@@ -1,0 +1,86 @@
+{
+  "name": "quiet-hours/end-restores-sound",
+  "criterion": "A Silent schedule restores normal sound at its end time, and Home shows it active during the window and the next start after it.",
+  "app_id": "com.sam.quiethours",
+  "approved_by": "samirsayyed, 2026-11-14 (first-criterion grilling, E1-E2; status checks added by agent)",
+  "good": "../../../.scratch/proofloop/apks/good-e4ba3eb.apk",
+  "bugs": [
+    {
+      "name": "end-hour-late",
+      "apk": "../../../.scratch/proofloop/apks/bug-end-hour-late-e4ba3eb.apk",
+      "role": "proof",
+      "expect": "E2"
+    },
+    {
+      "name": "pre-fix-72587d5",
+      "apk": "../../../.scratch/proofloop/apks/good-5.3.2.apk",
+      "role": "proof",
+      "expect": "E1s",
+      "note": "the commit before the status-line fix (e4ba3eb); no hand-written bug"
+    },
+    {
+      "name": "end-5min-early",
+      "apk": "../../../.scratch/proofloop/apks/bug-end-5min-early-e4ba3eb.apk",
+      "role": "held_out"
+    }
+  ],
+  "device": {
+    "timezone": "Asia/Kolkata",
+    "clock": "2026-11-18T08:58:00",
+    "grants": [
+      "android.permission.POST_NOTIFICATIONS"
+    ],
+    "dnd_access": true
+  },
+  "good_runs": 10,
+  "budget_minutes": 60,
+  "steps": [
+    {
+      "flow": "setup.yaml"
+    },
+    {
+      "set_clock": "08:59:55"
+    },
+    {
+      "probe": {
+        "checkpoint": "S",
+        "expect": "quiet",
+        "until": "09:00:25"
+      }
+    },
+    {
+      "set_clock": "16:59:15"
+    },
+    {
+      "wait_clock": "16:59:30"
+    },
+    {
+      "probe": {
+        "checkpoint": "E1",
+        "expect": "quiet"
+      }
+    },
+    {
+      "flow": "active.yaml"
+    },
+    {
+      "wait_clock": "17:00:00"
+    },
+    {
+      "probe": {
+        "checkpoint": "E2",
+        "expect": "normal",
+        "until": "17:01:00"
+      }
+    },
+    {
+      "flow": "ended.yaml"
+    }
+  ],
+  "repairs": [
+    {
+      "reason": "status flows force-stopped the app and cancelled its END alarm",
+      "change": "launchApp stopApp: false; force-stop blocked by the flow checker"
+    }
+  ]
+}

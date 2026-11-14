@@ -1,0 +1,14 @@
+--- a/app/src/main/java/com/sam/quiethours/presentation/create_schedule/components/DaySelector.kt	2026-11-14 17:26:46
++++ b/app/src/main/java/com/sam/quiethours/presentation/create_schedule/components/DaySelector.kt	2026-11-14 17:26:46
+@@ -89,9 +89,9 @@
+             )
+             QuickSelectPill(
+                 label = stringResource(R.string.weekdays),
+-                selected = selectedDays == setOf(1, 2, 3, 4, 5),
++                selected = selectedDays == setOf(2, 3, 4, 5, 6),
+                 onClick = {
+-                    onSelectionChanged(if (selectedDays != setOf(1, 2, 3, 4, 5)) setOf(1, 2, 3, 4, 5) else emptySet())
++                    onSelectionChanged(if (selectedDays != setOf(2, 3, 4, 5, 6)) setOf(2, 3, 4, 5, 6) else emptySet())
+                     AnalyticsManager.logButtonClick("Weekdays")
+                 }
+             )

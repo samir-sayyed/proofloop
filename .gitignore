@@ -1,0 +1,8 @@
+__pycache__/
+*.egg-info/
+.scratch/proofloop/apks/
+.scratch/proofloop/eval-out/
+.scratch/proofloop/bakeoff/out*/
+proofloop-out/
+eval-out/
+.scratch/oss/

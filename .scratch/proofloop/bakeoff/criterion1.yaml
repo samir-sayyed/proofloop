@@ -1,0 +1,44 @@
+# Criterion 1: a Weekdays schedule appears on Home with its title, "Weekdays", and the correct Next time.
+# Checkpoints are marked in comments; ProofLoop maps steps to checkpoints by order.
+# reset.sh pins the clock to Wed 18 Nov 2026 08:00 IST, so the next start of a 9:00 AM Weekdays schedule is today.
+appId: com.sam.quiethours
+---
+# Setup: skip onboarding and the trial screen
+# Clean state and the notification grant come from reset.sh (Environment manager), run before this flow.
+- launchApp
+# Repair 1 (kept): wait for first screen. Repair 2 (the real fix): reset.sh waits for the cleared task to be removed
+# before launch; launching earlier let the pending task removal kill the new process (blank screen).
+- extendedWaitUntil:
+    visible: "Get Started"
+    timeout: 20000
+- tapOn: "Get Started"
+- tapOn: "Explore App"
+- tapOn: "Continue"
+- extendedWaitUntil:
+    visible: "Manage your sound profiles"
+    timeout: 10000
+
+# C1: the wizard opens from "Add Schedule"
+- tapOn: "Add Schedule"
+- assertVisible: "Step 1 of 2"
+
+- tapOn: "Schedule Title"
+- inputText: "Smoke"
+- hideKeyboard
+- tapOn: "Weekdays"
+- tapOn: "Next"
+- assertVisible: "Step 2 of 2"
+- tapOn: "Activate"
+- tapOn: "Done"
+- extendedWaitUntil:
+    visible: "Manage your sound profiles"
+    timeout: 10000
+
+# C2: the title is listed on Home
+- assertVisible: "Smoke"
+
+# C3: the day summary reads "Weekdays"
+- assertVisible: "Weekdays"
+
+# C4: the status shows the right next start
+- assertVisible: "Next: Today 9:00 AM"

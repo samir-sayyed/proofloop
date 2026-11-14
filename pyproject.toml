@@ -1,0 +1,16 @@
+[project]
+name = "proofloop"
+version = "0.1.0"
+description = "Proof gate for agent-written Android UI tests: a test is accepted only if it passes repeatedly on a good build and fails at the expected checkpoint on seeded-bug builds."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+proofloop = "proofloop.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["proofloop"]

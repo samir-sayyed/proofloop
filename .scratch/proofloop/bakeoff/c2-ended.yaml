@@ -1,0 +1,10 @@
+# Criterion 2, E2 status: the next start is tomorrow (Thursday). Same no-force-stop rule as c2-active.yaml.
+appId: com.sam.quiethours
+---
+- launchApp:
+    stopApp: false
+- tapOn: "Meetings"
+- tapOn: "Home"
+- extendedWaitUntil:
+    visible: "Next: Tomorrow 9:00 AM"
+    timeout: 10000

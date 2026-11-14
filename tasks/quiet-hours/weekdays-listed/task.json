@@ -1,0 +1,44 @@
+{
+  "name": "quiet-hours/weekdays-listed",
+  "criterion": "Creating a Weekdays schedule and activating it shows it on Home with its title, 'Weekdays', and the correct next start.",
+  "app_id": "com.sam.quiethours",
+  "approved_by": "samirsayyed, 2026-11-14 (first-criterion grilling, C1-C4)",
+  "good": "../../../.scratch/proofloop/apks/good-e4ba3eb.apk",
+  "bugs": [
+    {
+      "name": "weekdays-off-by-one",
+      "apk": "../../../.scratch/proofloop/apks/bug-weekdays-off-by-one-e4ba3eb.apk",
+      "role": "proof",
+      "expect": "C3"
+    },
+    {
+      "name": "next-skips-today",
+      "apk": "../../../.scratch/proofloop/apks/bug-next-skips-today-e4ba3eb.apk",
+      "role": "held_out"
+    }
+  ],
+  "device": {
+    "timezone": "Asia/Kolkata",
+    "clock": "2026-11-18T08:00:00",
+    "grants": [
+      "android.permission.POST_NOTIFICATIONS"
+    ]
+  },
+  "good_runs": 10,
+  "budget_minutes": 40,
+  "steps": [
+    {
+      "flow": "flow.yaml"
+    }
+  ],
+  "repairs": [
+    {
+      "reason": "cold start sometimes showed a blank screen",
+      "change": "wait up to 20 s for the first screen"
+    },
+    {
+      "reason": "launch right after clearing data was killed by the pending task removal",
+      "change": "clean state moved out of the flow into the runner's reset, which waits for the old task to go"
+    }
+  ]
+}

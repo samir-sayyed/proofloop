@@ -1,0 +1,37 @@
+{
+  "name": "sunflower/garden-planting",
+  "criterion": "Adding a plant to the garden lists it on the My garden tab with today's planting date.",
+  "app_id": "com.google.samples.apps.sunflower",
+  "approved_by": "agent under owner's instruction to take decisions, 2026-11-14 (plan.md)",
+  "good": "../../../.scratch/proofloop/apks/sunflower-good.apk",
+  "bugs": [
+    {
+      "name": "garden-wrong-column",
+      "apk": "../../../.scratch/proofloop/apks/sunflower-bug-garden-wrong-column.apk",
+      "role": "proof",
+      "expect": "C2"
+    },
+    {
+      "name": "date-day-of-year",
+      "apk": "../../../.scratch/proofloop/apks/sunflower-bug-date-day-of-year.apk",
+      "role": "held_out"
+    }
+  ],
+  "device": {
+    "timezone": "Asia/Kolkata",
+    "clock": "2026-11-18T10:00:00"
+  },
+  "good_runs": 10,
+  "budget_minutes": 30,
+  "steps": [
+    {
+      "flow": "flow.yaml"
+    }
+  ],
+  "repairs": [
+    {
+      "reason": "a proof bug failed at setup, not C2: the first wait expected 'Your garden is empty', which a garden bug can change",
+      "change": "wait for the 'Plant list' tab, present in every state; no checkpoint changed"
+    }
+  ]
+}

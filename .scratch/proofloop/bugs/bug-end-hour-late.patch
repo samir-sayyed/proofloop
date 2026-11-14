@@ -1,0 +1,11 @@
+--- a/app/src/main/java/com/sam/quiethours/scheduling/VolumeScheduler.kt	2026-11-14 17:26:46
++++ b/app/src/main/java/com/sam/quiethours/scheduling/VolumeScheduler.kt	2026-11-14 17:26:46
+@@ -83,7 +83,7 @@
+         val next = nextStart(day, start, now)
+         val target = listOf(next.minusWeeks(1), next).map { endOf(it, start, end) }
+             .first { it.atZone(zone).isAfter(now.atZone(zone)) }
+-        return millisUntil(target, now, zone)
++        return millisUntil(target.plusHours(1), now, zone)
+     }
+ 
+     private fun endOf(startAt: LocalDateTime, start: LocalTime, end: LocalTime): LocalDateTime =
