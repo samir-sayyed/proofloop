@@ -72,6 +72,8 @@ Lists of user data: map the list and one item, not every row. Dialogs and sheets
 
 For each common task (or each acceptance criterion the user gave), write a step sheet: the
 shortest path from launch, one line per step, starting with the screen id.
+Routes are navigation only: taps and typing, and waits on anchors. Never put a wait for data or
+state in a route ("wait for Planted"); authors copy it above their checkpoints and it hides bugs.
 
 ```markdown
 ## route: add-weekday-schedule

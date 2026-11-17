@@ -62,6 +62,7 @@ Save flows in the task directory. Rules (the runner's flow checker enforces most
   Put the marker **before the wait that gates the assertion**: `extendedWaitUntil` counts as an
   assertion inside a checkpoint. A wait placed above the marker fails as "setup" on a bug build and
   the bug is not caught (all 6 authors in `experiments/map-effect` did this; see its README).
+  `proofloop check` rejects it, except waits on a screen anchor listed in the app map.
 - Blocked: `runScript`, `evalScript`, `openLink`, `runFlow`, `retry`, `repeat`, other app ids,
   and commands that change device state. Clock changes and probes go in `task.json` steps.
 

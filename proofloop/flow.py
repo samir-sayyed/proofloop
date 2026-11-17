@@ -120,7 +120,8 @@ def parse_flow(path: str | Path) -> Flow:
     return Flow(path, app_id, commands, checkpoints)
 
 
-def check_flow(flow: Flow, app_id: str) -> CheckResult:
+def check_flow(flow: Flow, app_id: str, anchors: frozenset[str] = frozenset()) -> CheckResult:
+    """anchors: texts the app map says are always on their screen; waiting on them is setup, not state."""
     r = CheckResult()
     where = flow.path.name
     if flow.app_id != app_id:
@@ -148,6 +149,24 @@ def check_flow(flow: Flow, app_id: str) -> CheckResult:
     for cp in flow.checkpoints:
         if not any(c.checkpoint == cp for c in flow.commands):
             r.errors.append(f"{where}: checkpoint {cp} has no assertion after its marker")
+    # A wait or assertion outside any checkpoint that leads straight into one (no action between)
+    # observes the same screen state: on a bug build it fails as "setup" and hides the checkpoint.
+    # All 6 fresh authors in experiments/map-effect made this mistake.
+    cmds = flow.commands
+    for i, c in enumerate(cmds):
+        if c.checkpoint or c.name not in ASSERTIONS:
+            continue
+        texts = re.findall(r'"([^"]+)"', c.body)
+        if texts and all(t in anchors for t in texts):
+            continue  # waiting for a screen anchor (from the app map) is setup
+        j = i + 1
+        while j < len(cmds) and not cmds[j].checkpoint and cmds[j].name in ASSERTIONS:
+            j += 1
+        if j < len(cmds) and cmds[j].checkpoint:
+            r.errors.append(f"{where}:{c.line}: {c.name} right before checkpoint {cmds[j].checkpoint} is outside it; "
+                            f"move the '# checkpoint: {cmds[j].checkpoint}' marker above it (a bug that breaks this "
+                            "state would fail at setup and not count), or, if it waits for text that is always on "
+                            "that screen, list the text as an anchor in the app map")
     return r
 
 
@@ -155,10 +174,15 @@ def check_task_flows(task) -> tuple[CheckResult, dict[str, Flow]]:
     """Check every flow in a task, and that each expected checkpoint exists somewhere."""
     total = CheckResult()
     flows: dict[str, Flow] = {}
+    anchors: frozenset[str] = frozenset()
+    map_path = task.dir.parent / "app-map.md"  # tasks/<app>/app-map.md
+    if map_path.exists():
+        from .appmap import load
+        anchors = frozenset(a for s in load(map_path).screens.values() for a in s.anchors)
     for p in task.flow_paths():
         f = parse_flow(p)
         flows[str(p)] = f
-        r = check_flow(f, task.app_id)
+        r = check_flow(f, task.app_id, anchors)
         total.errors += r.errors
         total.fallbacks += r.fallbacks
     declared = {cp for f in flows.values() for cp in f.checkpoints} | set(task.probe_checkpoints())

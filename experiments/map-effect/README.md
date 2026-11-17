@@ -37,6 +37,13 @@ argument; fixed before the other trials.)
 - The map arm's flows copied a "wait for Planted" step from the map's route, so the map carried the habit
   too. The route and the skill now say to assert that state inside a checkpoint (the skill rule is new).
 
+## Changes made from this
+
+- `proofloop check` now rejects a wait or assertion outside a checkpoint that leads straight into one,
+  unless it waits on a screen anchor from the app map. It rejects all six authored flows above and accepts
+  the fixed one, so this mistake now costs one `check` instead of a full proof run.
+- The app-map skill says routes are navigation only (no state waits).
+
 ## Limits
 
 - n=3 per arm, one app, one criterion, one author model: the time and call differences are suggestive, not

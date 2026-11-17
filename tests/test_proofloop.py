@@ -235,6 +235,25 @@ class FlowPolicy(unittest.TestCase):
             self.assertEqual([c.checkpoint for c in f.commands], [None, None, "C1", None, "C2", "C3"])
             self.assertTrue(check_flow(f, "com.example.app").ok)
 
+    def test_wait_right_before_checkpoint_is_rejected_unless_anchor(self):
+        gated = ('appId: com.example.app\n---\n- launchApp:\n    stopApp: false\n- tapOn: "Garden"\n'
+                 '- extendedWaitUntil:\n    visible: "{w}"\n    timeout: 5000\n'
+                 '# checkpoint: C1 plant listed\n- assertVisible: "Avocado"\n')
+        fixed = ('appId: com.example.app\n---\n- launchApp:\n    stopApp: false\n- tapOn: "Garden"\n'
+                 '# checkpoint: C1 plant listed\n- extendedWaitUntil:\n    visible: "Avocado"\n    timeout: 5000\n'
+                 '- assertVisible: "Avocado"\n')
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "f.yaml"
+            p.write_text(gated.format(w="Avocado"))
+            r = check_flow(parse_flow(p), "com.example.app")
+            self.assertFalse(r.ok)
+            self.assertIn("right before checkpoint C1", r.errors[0])
+            p.write_text(gated.format(w="My garden"))  # a screen anchor from the app map is setup
+            self.assertTrue(check_flow(parse_flow(p), "com.example.app", frozenset({"My garden"})).ok)
+            self.assertFalse(check_flow(parse_flow(p), "com.example.app").ok)
+            p.write_text(fixed)
+            self.assertTrue(check_flow(parse_flow(p), "com.example.app").ok)
+
 
 PROBE_STEPS = [
     {"flow": "flow.yaml"},
