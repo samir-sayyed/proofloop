@@ -15,16 +15,17 @@ select the test, are run afterwards to measure whether it catches defects it was
 
 ## Results so far
 
-**3 of 3 tasks proven on 2 apps, 7 of 7 bugs caught at their checkpoints, 0 flakes in 30 good-build runs.**
+**4 of 4 tasks proven on 2 apps, 8 of 8 bugs caught at their checkpoints, 0 flakes in 40 good-build runs.**
 
 | Task | Verdict | Good passes | Proof bugs caught | Held-out caught |
 |---|---|---|---|---|
 | quiet-hours/end-restores-sound | proven | 10/10 | 2/2 | 1/1 |
 | quiet-hours/weekdays-listed | proven | 10/10 | 1/1 | 1/1 |
 | sunflower/garden-planting | proven | 10/10 | 1/1 | 1/1 |
+| quiet-hours/next-start-saved-screen | proven | 10/10 | 1/1 | - |
 
 Apps: Quiet Hours (the author's own sound-scheduling app) and Google's open-source Sunflower sample.
-Flows written by Claude Code with Maestro, text locators only, no coordinate taps. One proof bug is not
+Flows written by Claude Code with Maestro, text locators only, no coordinate taps (the fourth task was written by a fresh session reading the app map; see [experiments/quiet-hours-loop](experiments/quiet-hours-loop/README.md)). One proof bug is not
 hand-written: it is the commit before a real fix. Pixel 8 emulator, Android 14.
 
 The proof also found a real bug in the Quiet Hours build everyone called good, and every rejection on

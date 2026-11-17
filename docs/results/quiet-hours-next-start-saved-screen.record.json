@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "proofloop_version": "0.1.0",
+  "task": "quiet-hours/next-start-saved-screen",
+  "criterion": "After a Weekdays schedule is activated on a Wednesday morning, the Routine saved screen states the next start as today at 9:00 AM.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/next-start-saved-screen/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/next-start-saved-screen/flow.yaml"
+  ],
+  "started": "2026-11-17T10:38:27",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-e4ba3eb.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 31.7,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 28.7,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 27.6,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 4,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 35.6,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 5,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 28.4,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 6,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 28.8,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 7,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 27.9,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 8,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 27.9,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 9,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 27.4,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 10,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 27.9,
+        "evidence": "",
+        "probes": []
+      }
+    ],
+    "required": 10,
+    "passes": 10,
+    "flake_upper_bound_95": 0.2588655508930523
+  },
+  "bugs": [
+    {
+      "name": "next-skips-today",
+      "role": "proof",
+      "expect": "A2",
+      "caught": true,
+      "result": {
+        "build": "next-skips-today",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "A2",
+        "step": "flow.yaml:38 assertVisible",
+        "error": "Assertion is false: \"Next start: Wed, Nov 18, 9:00 AM.*\" is visible",
+        "environment": false,
+        "seconds": 44.6,
+        "evidence": ".scratch/proofloop/final-next-start/next-skips-today-1/step1-flow/2026-11-17_104321/flow",
+        "probes": []
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5554",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64"
+  },
+  "approved_by": "agent under owner's instruction to take decisions, 2026-11-17 (plan.md)",
+  "verdict": "proven",
+  "reason": "passed 10/10; every proof bug failed at its expected checkpoint",
+  "seconds": 337.4,
+  "failure_label": "none"
+}

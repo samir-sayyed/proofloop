@@ -56,6 +56,8 @@ anchors: "Step 2 of 2", "Activate"
 anchors: "Routine saved", "Done"
 - tap "Done" -> home
 - rule: states the next start ("Next start: Wed, Nov 18, 9:00 AM") and when end settings apply (5:00 PM)
+- rule: the next start and the end-settings sentence are one text element ("Next start: Wed, Nov 18, 9:00 AM" then a newline and "End sound settings apply at 5:00 PM after that start. Check Home for routine status.")
+- rule: a text locator for the whole element must continue past the start line, e.g. "Next start: Wed, Nov 18, 9:00 AM.*"; the exact start line alone is not found by assertVisible
 
 ## screen: templates
 anchors: "Schedule Templates", "Built-in Templates"
