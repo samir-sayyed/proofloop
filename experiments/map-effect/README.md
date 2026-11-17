@@ -37,6 +37,34 @@ argument; fixed before the other trials.)
 - The map arm's flows copied a "wait for Planted" step from the map's route, so the map carried the habit
   too. The route and the skill now say to assert that state inside a checkpoint (the skill rule is new).
 
+## Re-run with the checker (round 2)
+
+Same criterion, brief and scoring, six new fresh sessions. The brief now says to run `./check.sh flow.yaml`
+(the checker above, with the map's anchors in the map arm) and fix every error, as the skill's procedure does.
+
+| Trial | Arm | Time | Tokens | Tool calls | Maestro calls | Good build | Verdict |
+|---|---|---|---|---|---|---|---|
+| 7 | control | 168 s | 73.5k | 9 | 8 | 3/3 | proven |
+| 8 | map | 111 s | 71.7k | 5 | 4 | 3/3 | proven |
+| 9 | control | 212 s | 76.2k | 11 | 11 | 3/3 | proven |
+| 10 | map | 99 s | 70.9k | 5 | 3 | 3/3 | proven |
+| 11 | control | 199 s | 76.0k | 10 | 12 | 3/3 | proven |
+| 12 | map | 72 s | 70.6k | 5 | 2 | 3/3 | proven |
+
+Means: control 193 s, 75.2k tokens, 10 tool calls, 10.3 Maestro calls; map 94 s, 71.1k tokens, 5 tool
+calls, 3 Maestro calls.
+
+- **All six flows were proven** (round 1: none of six). Each author's first draft failed the checker on
+  the marker-before-wait error and was fixed in one step. The bug now fails at C1 in every flow.
+- **The map's effect is the same as in round 1:** about half the time and tool calls, a third of the Maestro
+  calls, 5% fewer tokens, no change in whether the test is proven.
+- Trial 12's flow waits for "Plant list" before C1 on the garden screen. That text is a map anchor, so the
+  checker allows it, but it is on both tabs and syncs nothing. The good build passed 3/3, so it did not flake
+  here; it shows anchors can exempt a useless wait.
+- Scoring detail: `prove` finds the map at `tasks/<app>/app-map.md`. The scorer's task folder had none, so
+  trial 12 first came back `needs_human` (checker rejected the anchor wait); with the map beside the task,
+  as in the repo layout, it is proven. Trials 8 and 10 were unaffected.
+
 ## Changes made from this
 
 - `proofloop check` now rejects a wait or assertion outside a checkpoint that leads straight into one,
@@ -46,9 +74,9 @@ argument; fixed before the other trials.)
 
 ## Limits
 
-- n=3 per arm, one app, one criterion, one author model: the time and call differences are suggestive, not
+- n=3 per arm per round, one app, one criterion, one author model: the time and call differences are suggestive, not
   significant; the ranges barely separate (control 92-164 s, map 65-74 s).
 - The map was written after the garden-planting flow existed, so its route is not independent of the task.
   The criterion differs (two plants, not one with a date), but navigation is shared.
-- Fresh author sessions still saw the project's checkpoint rules in the brief, not the full skill.
-- A re-run with the fixed skill rule would test whether authors then produce proven tests; not done.
+- Fresh author sessions saw the project's checkpoint rules in the brief and a checker script, not the full skill.
+- Only one seeded bug and one criterion, so 'proven' here means one proof bug caught at C1.
