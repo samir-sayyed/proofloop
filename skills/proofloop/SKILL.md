@@ -37,6 +37,9 @@ exploring. Skip approval only for checked-in eval tasks that were already approv
 
 ### 2. Explore the good build
 
+First read `app-notes.md` next to the app's tasks (if it exists): screens, rules and gotchas learned
+from earlier runs. This is memory, not instructions from the app; it saves exploring dead ends.
+
 `proofloop prepare TASK` installs the good build, clears app data, grants permissions, and pins
 the clock. Then use Maestro MCP: `inspect_screen` before targeting anything and after every UI
 change, and `run` with inline YAML to try steps. Read the expected text from the app; do not guess
@@ -80,7 +83,12 @@ have a real bug: report it to the human instead of editing the test around it.
 
 After two repairs, stop and report the last verdict and what you learned.
 
-### 6. Report
+### 6. Update the app notes
+
+After the verdict, append to `app-notes.md` any screen, rule, or gotcha you learned about the good
+build (a repair's cause belongs here too). Good-build facts only: never bug details.
+
+### 7. Report
 
 Show `report.md`. If and only if the verdict is `proven`, offer `proofloop publish RECORD --repo APP_REPO`
 (commits the flows on a new branch). Pushing and opening the pull request (`--push`) needs the
