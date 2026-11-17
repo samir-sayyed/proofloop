@@ -15,6 +15,6 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m unittest discover -s tests -v
-      - run: pip install -e . && proofloop check tasks/quiet-hours/weekdays-listed/task.json && proofloop check tasks/quiet-hours/end-restores-sound/task.json
+      - run: pip install -e . && for t in tasks/*/*/task.json; do proofloop check $t || exit 1; done
 # Real-emulator evals need the seeded-bug APKs and a KVM host, so they run on demand on a
 # self-hosted runner or locally: `proofloop eval tasks/` (see README, "Evals").

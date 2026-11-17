@@ -1,4 +1,4 @@
-# Sunflower tasks (not built yet)
+# Sunflower tasks
 
 Second app for the eval suite: [android/sunflower](https://github.com/android/sunflower), Apache-2.0,
 cloned (depth 1, commit 2a357a3) to `.scratch/oss/sunflower`.
@@ -12,5 +12,12 @@ Seeded bugs (patches here, written against 2a357a3):
 - `bug-date-day-of-year` (held-out): date format `MMM D` (day of year) instead of `MMM d`, so the
   planting date reads "Nov 322, 2026" on 18 Nov 2026.
 
-Not done: building it runs the cloned project's Gradle scripts (third-party code), which needs the
-owner's go-ahead. Then: `build-apks.sh`, explore with Maestro, write `flow.yaml` and `task.json`, prove.
+Reproduce it (building runs the cloned project's Gradle scripts, which is third-party code: read them first):
+
+```bash
+git clone https://github.com/android/sunflower .scratch/oss/sunflower && git -C .scratch/oss/sunflower checkout 2a357a3
+tasks/sunflower/build-apks.sh
+proofloop prove tasks/sunflower/garden-planting/task.json
+```
+
+Result: proven, 10/10 clean runs, both bugs caught ([record](../../docs/results/sunflower-garden-planting.record.json)).
