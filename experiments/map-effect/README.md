@@ -22,14 +22,14 @@ criterion, three with `tasks/sunflower/app-map.md` and three without. ProofLoop 
 | 6 | map | 65 s | 68.4k | 3 | 2 | 3/3 | no (setup) |
 
 Means: control 131 s, 72.6k tokens, 7.7 tool calls, 6.7 Maestro calls; map 71 s, 68.5k tokens, 3.7
-tool calls, 2.7 Maestro calls. (Trial 1's Maestro count is the total, 5, from a logger fixed afterwards;
-trials 1-2 hierarchy/test splits are not comparable.)
+tool calls, 2.7 Maestro calls. (Trial 1's Maestro count is the total, 5, because its logger recorded only the first
+argument; fixed before the other trials.)
 
 ## What this shows
 
 - **The map saved effort, not correctness.** Map authors went straight to a passing flow: about half the
   time, half the tool calls, a third of the Maestro calls, about 6% fewer tokens (the map file is read
-  into context). Two of three never read the screen. All six flows passed the good build 3/3.
+  into context). One of three (trial 6) never read the screen; trial 4's author said it didn't, but its log shows one read. All six flows passed the good build 3/3.
 - **No author, with or without a map, produced a proven test.** All six waited for a plant name to be
   visible *above* the checkpoint marker. On the bug build the garden is empty, so that wait fails at
   "setup", which the gate refuses to count. Moving the two markers above their waits in trial 5's flow
