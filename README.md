@@ -51,6 +51,13 @@ Two parts:
   deterministic: flow allowlist and checkpoint mapping, app reset, clock and time-zone pinning,
   read-only sound probes, repeated runs, verdict, run record, report, and publishing.
 
+An optional third part, the **app-map skill** ([skills/app-map/SKILL.md](skills/app-map/SKILL.md)),
+explores an app once and writes `tasks/<app>/app-map.md`: screens, the actions between them, notes
+per screen (preconditions, rules, lookups, hazards) and known routes. The test-writing skill reads it
+first, so it does not rediscover the app. `proofloop map MAP FLOWS` checks a map and lists screens
+and actions no flow covers. The idea comes from askui's talk on agent test memory (nextapp devCon
+2026), where a map like this cut repeated agent mistakes from 87 to 0.
+
 Why this split: see [docs/adr/0002-skill-plus-runner.md](docs/adr/0002-skill-plus-runner.md).
 
 ## Install

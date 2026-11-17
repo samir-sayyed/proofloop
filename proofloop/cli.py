@@ -8,6 +8,7 @@
   proofloop prepare TASK           install the good build, reset the app, pin the clock (start state for exploring)
   proofloop probe                  print the device sound state (read-only)
   proofloop doctor                 check adb, device, Maestro and free space
+  proofloop map    MAP [FLOWS...]  check an app map; with flow files or dirs, report screens/actions no flow covers
 
 Exit codes: 0 proven / ok, 1 not proven, 2 usage or setup error.
 """
@@ -134,6 +135,30 @@ def cmd_doctor(args) -> int:
     return 0 if ok else 2
 
 
+def cmd_map(args) -> int:
+    from .appmap import check, coverage, load, unreachable
+    m = load(args.map)
+    errs = check(m)
+    n_edges = sum(len(s.edges) for s in m.screens.values())
+    n_notes = sum(len(s.notes) for s in m.screens.values())
+    print(f"{m.app}: {len(m.screens)} screens, {n_edges} actions, {n_notes} notes, {len(m.routes)} routes")
+    for e in errs:
+        print(f"ERROR {e}")
+    for s in unreachable(m):
+        print(f"FLAG  screen '{s}' is not reachable from '{next(iter(m.screens))}'")
+    if args.flows:
+        files = [f for p in map(Path, args.flows) for f in ([p] if p.is_file() else sorted(p.rglob("*.yaml")))]
+        cov = coverage(m, [f.read_text() for f in files])
+        for kind in ("screens", "edges"):
+            hit = [k for k, v in cov[kind].items() if v]
+            print(f"{kind}: {len(hit)}/{len(cov[kind])} covered by {len(files)} flows")
+            for k, v in cov[kind].items():
+                if not v:
+                    print(f"  not covered: {k}")
+    print("ok" if not errs else "not ok")
+    return 0 if not errs else 1
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="proofloop", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--device", help="adb serial (default: the only connected device)")
@@ -150,6 +175,7 @@ def main(argv=None) -> int:
     s = sub.add_parser("restore-clock"); s.set_defaults(fn=cmd_restore_clock)
     s = sub.add_parser("probe"); s.set_defaults(fn=cmd_probe)
     s = sub.add_parser("doctor"); s.set_defaults(fn=cmd_doctor)
+    s = sub.add_parser("map"); s.add_argument("map"); s.add_argument("flows", nargs="*"); s.set_defaults(fn=cmd_map)
     args = p.parse_args(argv)
     try:
         return args.fn(args)
