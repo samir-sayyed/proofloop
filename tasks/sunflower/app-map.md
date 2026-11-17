@@ -37,4 +37,4 @@ anchors: "Watering needs", "Navigate up"
 2. plant_list: wait for "Avocado", tap "Avocado"
 3. plant_detail: tap "Add plant", tap "Navigate up"
 4. plant_list: tap "My garden"
-5. garden: wait for "Planted"
+5. garden: "Planted" shows on each planted card (a state to assert in a checkpoint, not a setup wait)
