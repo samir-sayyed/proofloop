@@ -97,7 +97,8 @@ class Memory:
         self.sources: list[dict] = data.get("sources", [])
         self.facts: dict[str, dict] = data.get("facts", {})
         self.seen_screens: dict[str, list[str]] = data.get("seen_screens", {})  # build -> screens observed
-        self.pending: dict[str, str] = data.get("pending", {})  # exact text that failed -> screen, awaiting a fix
+        self.pending: dict[str, str] = data.get("pending", {})
+        self.current_build: str | None = data.get("current_build")  # set with `learn --current-build`  # exact text that failed -> screen, awaiting a fix
 
     # -- write path ---------------------------------------------------------------------------
     def ingest_session(self, source_id: str, build: str, runs: list[list[Step]], when: str = "") -> bool:
@@ -181,7 +182,9 @@ class Memory:
 
     # -- manage -------------------------------------------------------------------------------
     def newest_build(self) -> str | None:
-        """The build of the most recent run, by run time, not by the order sources were ingested."""
+        """The current build if set, else the build of the most recent run (by run time, not ingest order)."""
+        if self.current_build:
+            return self.current_build
         if not self.sources:
             return None
         return max(enumerate(self.sources), key=lambda p: (p[1].get("when", ""), p[0]))[1]["build"]
@@ -200,7 +203,8 @@ class Memory:
     def save(self):
         self.path.write_text(json.dumps({"app": self.app, "sources": self.sources, "facts": self.facts,
                                          "seen_screens": self.seen_screens,
-                                         "pending": self.pending}, indent=1) + "\n")
+                                         "pending": self.pending,
+                                         "current_build": self.current_build}, indent=1) + "\n")
 
     # -- read path ----------------------------------------------------------------------------
     def render(self) -> str:

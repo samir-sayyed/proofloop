@@ -122,6 +122,8 @@ class LearnTest(unittest.TestCase):
         self.assertEqual(mem.newest_build(), "good-2")
         self.assertEqual(mem.status(mem.facts["edge|home|New|editor"]), "stale")
         self.assertNotEqual(mem.status(mem.facts["edge|home|Add|editor"]), "stale")
+        mem.current_build = "good-1"  # an older build re-tested later must not hide the release build
+        self.assertEqual(mem.newest_build(), "good-1")
 
     def test_slow_wait_and_flaky_step(self):
         mem = Memory(self.app)

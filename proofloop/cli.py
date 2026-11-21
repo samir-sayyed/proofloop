@@ -215,6 +215,8 @@ def cmd_learn(args) -> int:
         for d in sorted((Path(t) / "attempts").iterdir()):
             meta = json.loads((d / "attempt.json").read_text()) if (d / "attempt.json").exists() else {}
             n += mem.ingest_session(f"attempt:{t}@{d.name}", meta.get("build", ""), runs_from_attempts([d]), d.name)
+    if args.current_build:
+        mem.current_build = args.current_build
     mem.save()
     (app / "learned.md").write_text(mem.render())
     print(f"{n} new sources; {len(mem.facts)} facts; wrote {app / 'learned.md'}")
@@ -259,7 +261,9 @@ def main(argv=None) -> int:
     s.add_argument("--attempts", action="append", help="task dir whose attempts/ to ingest; repeatable")
     s.add_argument("--maestro-tests", help="import authoring runs from a Maestro tests dir (~/.maestro/tests)")
     s.add_argument("--match", default="", help="with --maestro-tests: only runs whose maestro.log mentions this")
-    s.add_argument("--build", help="with --maestro-tests: the good build those runs used"); s.set_defaults(fn=cmd_learn)
+    s.add_argument("--build", help="with --maestro-tests: the good build those runs used")
+    s.add_argument("--current-build", help="the app's current good build, for staleness (default: build of the latest run)")
+    s.set_defaults(fn=cmd_learn)
     s = sub.add_parser("report"); s.add_argument("record"); s.set_defaults(fn=cmd_report)
     s = sub.add_parser("publish"); s.add_argument("record"); s.add_argument("--repo", required=True)
     s.add_argument("--push", action="store_true", help="push and open a PR with gh"); s.set_defaults(fn=cmd_publish)
