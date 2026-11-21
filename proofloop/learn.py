@@ -70,6 +70,11 @@ def parse_commands(path) -> list[Step]:
     return steps
 
 
+def _stamp(when: str) -> str:
+    """Comparable time from any of '2026-11-21T11:02:32', '20261121-110232', '2026-11-21_115557'."""
+    return re.sub(r"\D", "", when or "")[:14]
+
+
 def _matches(pattern: str, text: str) -> bool:
     try:
         return re.fullmatch(pattern, text, re.S) is not None
@@ -95,13 +100,13 @@ class Memory:
         self.pending: dict[str, str] = data.get("pending", {})  # exact text that failed -> screen, awaiting a fix
 
     # -- write path ---------------------------------------------------------------------------
-    def ingest_session(self, source_id: str, build: str, runs: list[list[Step]]) -> bool:
-        """One attempt, or the good runs of one proof, in time order, all on the good build `build`."""
+    def ingest_session(self, source_id: str, build: str, runs: list[list[Step]], when: str = "") -> bool:
+        """One attempt, or the good runs of one proof, all on the good build `build`, run at time `when`."""
         if any(s["id"] == source_id for s in self.sources):
             return False
         if not build or "bug" in build.lower():
             raise ValueError(f"refusing to learn from build {build!r}: memory learns from the good build only")
-        self.sources.append({"id": source_id, "build": build, "runs": len(runs)})
+        self.sources.append({"id": source_id, "build": build, "runs": len(runs), "when": _stamp(when)})
         failed_exact = self.pending  # persists across attempts: a failure now, the fix in a later attempt
         for steps in runs:
             screen, taps = None, []
@@ -176,7 +181,10 @@ class Memory:
 
     # -- manage -------------------------------------------------------------------------------
     def newest_build(self) -> str | None:
-        return self.sources[-1]["build"] if self.sources else None
+        """The build of the most recent run, by run time, not by the order sources were ingested."""
+        if not self.sources:
+            return None
+        return max(enumerate(self.sources), key=lambda p: (p[1].get("when", ""), p[0]))[1]["build"]
 
     def status(self, f) -> str:
         if f.get("status_note", "").startswith("contradicted"):
@@ -229,8 +237,8 @@ class Memory:
         return json.dumps(f)
 
 
-def runs_from_record_dir(record_dir) -> tuple[str, str, list[list[Step]]]:
-    """(source id, build, good runs) from a proof output dir. Bug runs are never read."""
+def runs_from_record_dir(record_dir) -> tuple[str, str, list[list[Step]], str]:
+    """(source id, build, good runs, start time) from a proof output dir. Bug runs are never read."""
     record_dir = Path(record_dir)
     for f in (record_dir / "record.json", record_dir.with_name(record_dir.name + ".record.json")):  # prove / eval layout
         if f.exists():
@@ -245,13 +253,20 @@ def runs_from_record_dir(record_dir) -> tuple[str, str, list[list[Step]]]:
         steps = [st for c in cmds for st in parse_commands(c)]
         if steps:
             runs.append(steps)
-    return f"proof:{rec['task']}@{rec.get('started', record_dir.name)}", build, runs
+    return f"proof:{rec['task']}@{rec.get('started', record_dir.name)}", build, runs, rec.get("started", "")
 
 
 def runs_from_attempts(attempt_dirs) -> list[list[Step]]:
-    """Authoring attempts in time order (directory name order)."""
+    """One run per attempt dir, in time order; a multi-flow task's flows are joined in step order,
+    the same way proof runs are."""
     runs = []
     for d in sorted(Path(a) for a in attempt_dirs):
-        for c in sorted(d.glob("**/commands.json")):
-            runs.append(parse_commands(c))
+        steps = [st for c in sorted(d.glob("**/commands.json")) for st in parse_commands(c)]
+        if steps:
+            runs.append(steps)
     return runs
+
+
+def is_bug_or_scoring_run(maestro_log: str) -> bool:
+    """Imported Maestro sessions: skip anything that ran a bug build or came from a scoring/proof folder."""
+    return bool(re.search(r"/score/|/proofloop-out/|/eval-out/|\bbug-[\w.-]*\.apk", maestro_log))

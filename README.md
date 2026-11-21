@@ -287,7 +287,9 @@ The map is written by people; `learned.md` beside it is written by the runner. E
 has learned: edges between screens, multi-tap routes, locator fixes (text that failed exactly and passed as a
 pattern), slow waits and flaky steps. A fact is a candidate until re-observed, is contradicted when the exact text
 later passes, and goes stale when a newer build shows its screen without it. Bug-build runs are never read, and
-learned facts never become anchors.
+learned facts never become anchors. `prove` updates `learned.md` and `app-memory.json` beside the app map
+(`--no-learn` skips it), and `try` keeps attempts under `<task>/attempts/` with device logs: keep `attempts/` out of
+git.
 
 In a live test, three fresh authors given the original map plus memory learned automatically from one earlier
 author's attempts all avoided the failure that every author with the original map hit, and all three tests were

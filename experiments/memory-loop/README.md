@@ -50,9 +50,26 @@ Compared with the earlier arms on the same criterion (from [quiet-hours-loop](..
 |---|---|---|---|
 | Original map | 3 of 3 | 137 s | 7.3 |
 | Map grown by an author by hand | 0 of 3 | 93 s | 5.3 |
-| Original map + memory learned automatically | 0 of 3 | 80 s (trials 2-3) | 3 (trials 2-3) |
+| Original map + memory learned automatically | 0 of 3 | 150 s (3 trials); 80 s (trials 2-3, without the harness bug) | 6.7; 3 |
 
 All nine flows in all three arms were proven; memory changes effort, not correctness.
+
+What this shows: the learner reproduced the same fact the growth author once wrote into the map by hand, so the
+write step no longer depends on an agent choosing to write it. It does not show the learner finding something an
+author would have missed.
+
+## The `try` loop on the device
+
+The live authors above used memory imported from Maestro's kept sessions. The intended path is `proofloop try`, so
+it was checked on the device too: a scratch copy of `next-start-saved-screen` with the exact "Next start" text
+failed at A2; with `.*` it passed twice. `learned.md` then listed the locator fix as confirmed (failed then fixed in
+1 session, fixed form passed 2 times).
+
+## Import isolation
+
+`--maestro-tests` imports only sessions whose log mentions `--match`, and skips any log that mentions a scoring or
+proof folder (`/score/`, `/proofloop-out/`, `/eval-out/`) or a `bug-*.apk`. The source counts above equal the
+authors' own runs (3 for the growth author; 9, 7 and 12 for the later groups), so no scoring run was imported.
 
 ## Limits
 

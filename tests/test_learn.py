@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from proofloop.learn import Memory, parse_commands, runs_from_attempts, runs_from_record_dir
+from proofloop.learn import Memory, is_bug_or_scoring_run, parse_commands, runs_from_attempts, runs_from_record_dir
 
 MAP = '''# App map: Demo
 app: com.example.demo
@@ -95,7 +95,7 @@ class LearnTest(unittest.TestCase):
         write_run(out / "good-1" / "step1-flow" / "t" / "flow", good)
         write_run(out / "weekdays-off-by-one-1" / "step1-flow" / "t" / "flow", bug)
         (out / "record.json").write_text(json.dumps({"task": "demo/t", "started": "x", "good": {"apk": "a/good-1.apk"}}))
-        sid, build, runs = runs_from_record_dir(out)
+        sid, build, runs, _ = runs_from_record_dir(out)
         self.assertEqual((build, len(runs)), ("good-1", 1))
         mem = Memory(self.app)
         mem.ingest_session(sid, build, runs)
@@ -112,6 +112,44 @@ class LearnTest(unittest.TestCase):
         (self.app / "learned.md").write_text(mem.render())
         self.assertEqual((self.app / "app-map.md").read_text(), MAP)
         self.assertNotIn("anchors:", (self.app / "learned.md").read_text())
+
+    def test_staleness_follows_run_time_not_ingest_order(self):
+        mem = Memory(self.app)
+        new = [cmd("visible", "Home title"), cmd("tap", "Add"), cmd("visible", "Editor title")]
+        old = [cmd("visible", "Home title"), cmd("tap", "New"), cmd("visible", "Editor title")]
+        mem.ingest_session("new", "good-2", self.attempt("2", new), "2026-11-21_120000")
+        mem.ingest_session("old", "good-1", self.attempt("1", old), "2026-11-17_090000")  # ingested later, ran earlier
+        self.assertEqual(mem.newest_build(), "good-2")
+        self.assertEqual(mem.status(mem.facts["edge|home|New|editor"]), "stale")
+        self.assertNotEqual(mem.status(mem.facts["edge|home|Add|editor"]), "stale")
+
+    def test_slow_wait_and_flaky_step(self):
+        mem = Memory(self.app)
+        slow = [cmd("visible", "Home title"), cmd("visible", "Loaded", ms=7000, timeout=10000)]
+        mem.ingest_session("a1", "good-1", self.attempt("1", slow))
+        mem.ingest_session("a2", "good-1", self.attempt("2", slow))
+        f = mem.facts["slow|home|Loaded"]
+        self.assertEqual((f["data"]["max_ms"], mem.status(f)), (7000, "confirmed"))
+        ok = [cmd("visible", "Home title"), cmd("tap", "Add")]
+        bad = [cmd("visible", "Home title"), cmd("tap", "Add", ok=False)]
+        runs = [self.attempt(n, c)[0] for n, c in (("p1", ok), ("p2", bad), ("p3", ok))]
+        mem.ingest_flaky("proof", "good-1", runs)
+        self.assertEqual(mem.facts['flaky|tap|Add']["data"]["failed"], 1)
+
+    def test_multi_flow_attempt_is_one_run(self):
+        d = self.app / "attempts" / "x"
+        write_run(d / "good-1" / "step1-setup" / "t" / "flow", [cmd("visible", "Home title"), cmd("tap", "Add")])
+        write_run(d / "good-1" / "step2-check" / "t" / "flow", [cmd("visible", "Editor title")])
+        runs = runs_from_attempts([d])
+        self.assertEqual(len(runs), 1)
+        mem = Memory(self.app)
+        mem.ingest_session("x", "good-1", runs)
+        self.assertIn("edge|home|Add|editor", mem.facts)  # the screen carried across the two flows
+
+    def test_import_skips_scoring_and_bug_runs(self):
+        self.assertTrue(is_bug_or_scoring_run("Flow /tmp/exp/l1/score/flow.yaml"))
+        self.assertTrue(is_bug_or_scoring_run("installing bug-next-skips-today-e4ba3eb.apk"))
+        self.assertFalse(is_bug_or_scoring_run("Flow /tmp/exp/l1/flow.yaml debug output"))
 
     def test_parse_skips_implicit_commands(self):
         p = self.app / "c.json"

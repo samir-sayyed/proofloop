@@ -151,8 +151,8 @@ def _app_dir(task):
 def _learn_proof(app_dir, out) -> str:
     from .learn import Memory, runs_from_record_dir
     mem = Memory(app_dir)
-    sid, build, runs = runs_from_record_dir(out)
-    if mem.ingest_session(sid, build, runs):
+    sid, build, runs, when = runs_from_record_dir(out)
+    if mem.ingest_session(sid, build, runs, when):
         mem.ingest_flaky(sid, build, runs)
     mem.save()
     (app_dir / "learned.md").write_text(mem.render())
@@ -186,7 +186,7 @@ def cmd_try(args) -> int:
     app = _app_dir(task)
     if app and not r.environment:
         mem = Memory(app)
-        mem.ingest_session(f"attempt:{task.name}@{out.name}", build, runs_from_attempts([out]))
+        mem.ingest_session(f"attempt:{task.name}@{out.name}", build, runs_from_attempts([out]), out.name)
         mem.save()
         (app / "learned.md").write_text(mem.render())
         print(f"memory updated: {app / 'learned.md'}")
@@ -194,7 +194,7 @@ def cmd_try(args) -> int:
 
 
 def cmd_learn(args) -> int:
-    from .learn import Memory, runs_from_attempts
+    from .learn import Memory, is_bug_or_scoring_run, runs_from_attempts
     app = Path(args.app_dir)
     mem = Memory(app)
     n = 0
@@ -204,15 +204,17 @@ def cmd_learn(args) -> int:
     if args.maestro_tests:
         if not args.build:
             raise ValueError("--maestro-tests needs --build (the good build those runs used)")
-        dirs = sorted(d for d in Path(args.maestro_tests).iterdir()
-                      if (d / "maestro.log").exists() and args.match in (d / "maestro.log").read_text(errors="ignore")
-                      and any(d.glob("*/commands.json")))
+        dirs = []
+        for d in sorted(Path(args.maestro_tests).iterdir()):
+            log = (d / "maestro.log").read_text(errors="ignore") if (d / "maestro.log").exists() else ""
+            if args.match in log and not is_bug_or_scoring_run(log) and any(d.glob("*/commands.json")):
+                dirs.append(d)
         for d in dirs:
-            n += mem.ingest_session(f"maestro:{d.name}", args.build, runs_from_attempts([d]))
+            n += mem.ingest_session(f"maestro:{d.name}", args.build, runs_from_attempts([d]), d.name)
     for t in args.attempts or []:
         for d in sorted((Path(t) / "attempts").iterdir()):
             meta = json.loads((d / "attempt.json").read_text()) if (d / "attempt.json").exists() else {}
-            n += mem.ingest_session(f"attempt:{t}@{d.name}", meta.get("build", ""), runs_from_attempts([d]))
+            n += mem.ingest_session(f"attempt:{t}@{d.name}", meta.get("build", ""), runs_from_attempts([d]), d.name)
     mem.save()
     (app / "learned.md").write_text(mem.render())
     print(f"{n} new sources; {len(mem.facts)} facts; wrote {app / 'learned.md'}")

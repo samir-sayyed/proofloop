@@ -4,162 +4,194 @@
   {
    "id": "maestro:2026-11-17_100549",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117100549"
   },
   {
    "id": "maestro:2026-11-17_100648",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117100648"
   },
   {
    "id": "maestro:2026-11-17_100721",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117100721"
   },
   {
    "id": "maestro:2026-11-17_101244",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117101244"
   },
   {
    "id": "maestro:2026-11-17_101348",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117101348"
   },
   {
    "id": "maestro:2026-11-17_101418",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117101418"
   },
   {
    "id": "maestro:2026-11-17_102102",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117102102"
   },
   {
    "id": "maestro:2026-11-17_102200",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117102200"
   },
   {
    "id": "maestro:2026-11-17_102230",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117102230"
   },
   {
    "id": "maestro:2026-11-17_102926",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117102926"
   },
   {
    "id": "maestro:2026-11-17_103029",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117103029"
   },
   {
    "id": "maestro:2026-11-17_103100",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117103100"
   },
   {
    "id": "maestro:2026-11-17_101728",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117101728"
   },
   {
    "id": "maestro:2026-11-17_101802",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117101802"
   },
   {
    "id": "maestro:2026-11-17_102545",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117102545"
   },
   {
    "id": "maestro:2026-11-17_102620",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117102620"
   },
   {
    "id": "maestro:2026-11-17_103409",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117103409"
   },
   {
    "id": "maestro:2026-11-17_103444",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117103444"
   },
   {
    "id": "maestro:2026-11-17_103515",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261117103515"
   },
   {
    "id": "maestro:2026-11-21_125741",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121125741"
   },
   {
    "id": "maestro:2026-11-21_125806",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121125806"
   },
   {
    "id": "maestro:2026-11-21_125833",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121125833"
   },
   {
    "id": "maestro:2026-11-21_125932",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121125932"
   },
   {
    "id": "maestro:2026-11-21_130005",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121130005"
   },
   {
    "id": "maestro:2026-11-21_130039",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121130039"
   },
   {
    "id": "maestro:2026-11-21_130108",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121130108"
   },
   {
    "id": "maestro:2026-11-21_130144",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121130144"
   },
   {
    "id": "maestro:2026-11-21_130652",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121130652"
   },
   {
    "id": "maestro:2026-11-21_130723",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121130723"
   },
   {
    "id": "maestro:2026-11-21_131127",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121131127"
   },
   {
    "id": "maestro:2026-11-21_131200",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121131200"
   },
   {
    "id": "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647",
    "build": "good-e4ba3eb",
-   "runs": 1
+   "runs": 1,
+   "when": "20261121125647"
   }
  ],
  "facts": {
