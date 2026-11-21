@@ -1,0 +1,474 @@
+{
+ "app": "com.sam.quiethours",
+ "sources": [
+  {
+   "id": "maestro:2026-11-17_100549",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_100648",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_100721",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_101244",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_101348",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_101418",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_102102",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_102200",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_102230",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_102926",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_103029",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_103100",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_101728",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_101802",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_102545",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_102620",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_103409",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_103444",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-17_103515",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_125741",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_125806",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_125833",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_125932",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_130005",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_130039",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_130108",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_130144",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_130652",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_130723",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_131127",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "maestro:2026-11-21_131200",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  },
+  {
+   "id": "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647",
+   "build": "good-e4ba3eb",
+   "runs": 1
+  }
+ ],
+ "facts": {
+  "edge|welcome|Get Started|routine_picker": {
+   "kind": "edge",
+   "screen": "welcome",
+   "data": {
+    "tap": "Get Started",
+    "to": "routine_picker"
+   },
+   "sources": [
+    "maestro:2026-11-17_100549",
+    "maestro:2026-11-17_100648",
+    "maestro:2026-11-17_100721",
+    "maestro:2026-11-17_101244",
+    "maestro:2026-11-17_101348",
+    "maestro:2026-11-17_101418",
+    "maestro:2026-11-17_102102",
+    "maestro:2026-11-17_102200",
+    "maestro:2026-11-17_102230",
+    "maestro:2026-11-17_102926",
+    "maestro:2026-11-17_103029",
+    "maestro:2026-11-17_103100",
+    "maestro:2026-11-17_101728",
+    "maestro:2026-11-17_101802",
+    "maestro:2026-11-17_102545",
+    "maestro:2026-11-17_102620",
+    "maestro:2026-11-17_103409",
+    "maestro:2026-11-17_103444",
+    "maestro:2026-11-17_103515",
+    "maestro:2026-11-21_125932",
+    "maestro:2026-11-21_130108",
+    "maestro:2026-11-21_130144",
+    "maestro:2026-11-21_131127",
+    "maestro:2026-11-21_131200",
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 25
+  },
+  "edge|routine_picker|Explore App|trial": {
+   "kind": "edge",
+   "screen": "routine_picker",
+   "data": {
+    "tap": "Explore App",
+    "to": "trial"
+   },
+   "sources": [
+    "maestro:2026-11-17_100549",
+    "maestro:2026-11-17_100648",
+    "maestro:2026-11-17_100721",
+    "maestro:2026-11-17_101244",
+    "maestro:2026-11-17_101348",
+    "maestro:2026-11-17_101418",
+    "maestro:2026-11-17_102102",
+    "maestro:2026-11-17_102200",
+    "maestro:2026-11-17_102230",
+    "maestro:2026-11-17_101728",
+    "maestro:2026-11-17_101802",
+    "maestro:2026-11-17_102545",
+    "maestro:2026-11-17_102620",
+    "maestro:2026-11-17_103409",
+    "maestro:2026-11-17_103444",
+    "maestro:2026-11-17_103515",
+    "maestro:2026-11-21_125932",
+    "maestro:2026-11-21_130108",
+    "maestro:2026-11-21_130144",
+    "maestro:2026-11-21_131127",
+    "maestro:2026-11-21_131200",
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 22
+  },
+  "edge|trial|Continue|home": {
+   "kind": "edge",
+   "screen": "trial",
+   "data": {
+    "tap": "Continue",
+    "to": "home"
+   },
+   "sources": [
+    "maestro:2026-11-17_100549",
+    "maestro:2026-11-17_100648",
+    "maestro:2026-11-17_100721",
+    "maestro:2026-11-17_101244",
+    "maestro:2026-11-17_101348",
+    "maestro:2026-11-17_101418",
+    "maestro:2026-11-17_102102",
+    "maestro:2026-11-17_102200",
+    "maestro:2026-11-17_102230",
+    "maestro:2026-11-17_101728",
+    "maestro:2026-11-17_101802",
+    "maestro:2026-11-17_102545",
+    "maestro:2026-11-17_102620",
+    "maestro:2026-11-17_103409",
+    "maestro:2026-11-17_103444",
+    "maestro:2026-11-17_103515",
+    "maestro:2026-11-21_125932",
+    "maestro:2026-11-21_130108",
+    "maestro:2026-11-21_130144",
+    "maestro:2026-11-21_131127",
+    "maestro:2026-11-21_131200",
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 22
+  },
+  "edge|home|Add Schedule|wizard_details": {
+   "kind": "edge",
+   "screen": "home",
+   "data": {
+    "tap": "Add Schedule",
+    "to": "wizard_details"
+   },
+   "sources": [
+    "maestro:2026-11-17_100549",
+    "maestro:2026-11-17_100648",
+    "maestro:2026-11-17_100721",
+    "maestro:2026-11-17_101244",
+    "maestro:2026-11-17_101348",
+    "maestro:2026-11-17_101418",
+    "maestro:2026-11-17_102102",
+    "maestro:2026-11-17_102200",
+    "maestro:2026-11-17_102230",
+    "maestro:2026-11-17_102926",
+    "maestro:2026-11-17_103029",
+    "maestro:2026-11-17_103100",
+    "maestro:2026-11-17_101728",
+    "maestro:2026-11-17_101802",
+    "maestro:2026-11-17_102545",
+    "maestro:2026-11-17_102620",
+    "maestro:2026-11-17_103409",
+    "maestro:2026-11-17_103444",
+    "maestro:2026-11-17_103515",
+    "maestro:2026-11-21_125932",
+    "maestro:2026-11-21_130108",
+    "maestro:2026-11-21_130144",
+    "maestro:2026-11-21_130652",
+    "maestro:2026-11-21_130723",
+    "maestro:2026-11-21_131127",
+    "maestro:2026-11-21_131200",
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 27
+  },
+  "route|wizard_details|Schedule Title>Weekdays>Next|wizard_review": {
+   "kind": "route",
+   "screen": "wizard_details",
+   "data": {
+    "taps": [
+     "Schedule Title",
+     "Weekdays",
+     "Next"
+    ],
+    "to": "wizard_review"
+   },
+   "sources": [
+    "maestro:2026-11-17_100549",
+    "maestro:2026-11-17_100648",
+    "maestro:2026-11-17_100721",
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 4
+  },
+  "edge|wizard_review|Activate|saved": {
+   "kind": "edge",
+   "screen": "wizard_review",
+   "data": {
+    "tap": "Activate",
+    "to": "saved"
+   },
+   "sources": [
+    "maestro:2026-11-17_100549",
+    "maestro:2026-11-17_100648",
+    "maestro:2026-11-17_100721",
+    "maestro:2026-11-17_101244",
+    "maestro:2026-11-17_101348",
+    "maestro:2026-11-17_101418",
+    "maestro:2026-11-17_102102",
+    "maestro:2026-11-17_102200",
+    "maestro:2026-11-17_102230",
+    "maestro:2026-11-17_102926",
+    "maestro:2026-11-17_103029",
+    "maestro:2026-11-17_103100",
+    "maestro:2026-11-17_101728",
+    "maestro:2026-11-17_101802",
+    "maestro:2026-11-17_102545",
+    "maestro:2026-11-17_102620",
+    "maestro:2026-11-17_103409",
+    "maestro:2026-11-17_103444",
+    "maestro:2026-11-17_103515",
+    "maestro:2026-11-21_125932",
+    "maestro:2026-11-21_130108",
+    "maestro:2026-11-21_130144",
+    "maestro:2026-11-21_130652",
+    "maestro:2026-11-21_130723",
+    "maestro:2026-11-21_131127",
+    "maestro:2026-11-21_131200",
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 27
+  },
+  "locator|saved|Next start: Wed, Nov 18, 9:00 AM": {
+   "kind": "locator",
+   "screen": "saved",
+   "data": {
+    "failed": "Next start: Wed, Nov 18, 9:00 AM",
+    "works": "Next start: Wed, Nov 18, 9:00 AM.*"
+   },
+   "sources": [
+    "maestro:2026-11-17_100648",
+    "maestro:2026-11-17_101348",
+    "maestro:2026-11-17_102200",
+    "maestro:2026-11-17_103029"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 4,
+   "passes": 25
+  },
+  "route|wizard_details|Schedule Title>Daily>Next|wizard_review": {
+   "kind": "route",
+   "screen": "wizard_details",
+   "data": {
+    "taps": [
+     "Schedule Title",
+     "Daily",
+     "Next"
+    ],
+    "to": "wizard_review"
+   },
+   "sources": [
+    "maestro:2026-11-17_101244",
+    "maestro:2026-11-17_101348",
+    "maestro:2026-11-17_101418",
+    "maestro:2026-11-17_102102",
+    "maestro:2026-11-17_102200",
+    "maestro:2026-11-17_102230",
+    "maestro:2026-11-17_102926",
+    "maestro:2026-11-17_103029",
+    "maestro:2026-11-17_103100",
+    "maestro:2026-11-17_101728",
+    "maestro:2026-11-17_101802",
+    "maestro:2026-11-17_102545",
+    "maestro:2026-11-17_102620",
+    "maestro:2026-11-17_103409",
+    "maestro:2026-11-17_103444",
+    "maestro:2026-11-17_103515",
+    "maestro:2026-11-21_125932",
+    "maestro:2026-11-21_130108",
+    "maestro:2026-11-21_130144",
+    "maestro:2026-11-21_130652",
+    "maestro:2026-11-21_130723",
+    "maestro:2026-11-21_131127",
+    "maestro:2026-11-21_131200"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 23
+  },
+  "route|routine_picker|Explore App>Continue|home": {
+   "kind": "route",
+   "screen": "routine_picker",
+   "data": {
+    "taps": [
+     "Explore App",
+     "Continue"
+    ],
+    "to": "home"
+   },
+   "sources": [
+    "maestro:2026-11-17_102926",
+    "maestro:2026-11-17_103029",
+    "maestro:2026-11-17_103100"
+   ],
+   "builds": [
+    "good-e4ba3eb"
+   ],
+   "runs": 3
+  }
+ },
+ "seen_screens": {
+  "good-e4ba3eb": [
+   "welcome",
+   "routine_picker",
+   "trial",
+   "home",
+   "wizard_details",
+   "wizard_review",
+   "saved"
+  ]
+ },
+ "pending": {}
+}

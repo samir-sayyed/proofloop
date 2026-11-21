@@ -9,6 +9,8 @@
   proofloop probe                  print the device sound state (read-only)
   proofloop doctor                 check adb, device, Maestro and free space
   proofloop map    MAP [FLOWS...]  check an app map; with flow files or dirs, report screens/actions no flow covers
+  proofloop try    TASK            run the task once on the good build, keep the attempt, learn from it
+  proofloop learn  APP_DIR [...]   learn app memory from proofs, attempts or imported Maestro runs
 
 Exit codes: 0 proven / ok, 1 not proven, 2 usage or setup error.
 """
@@ -67,6 +69,12 @@ def cmd_prove(args) -> int:
     (out / "report.md").write_text(render(record))
     print(render(record))
     print(f"record: {out / 'record.json'}")
+    app = _app_dir(task)
+    if app and args.learn:
+        try:
+            print(_learn_proof(app, out))
+        except Exception as e:  # learning never changes a verdict
+            print(f"memory not updated: {e}")
     return 0 if record["verdict"] == "proven" else 1
 
 
@@ -135,6 +143,82 @@ def cmd_doctor(args) -> int:
     return 0 if ok else 2
 
 
+def _app_dir(task):
+    d = task.dir.parent
+    return d if (d / "app-map.md").exists() else None
+
+
+def _learn_proof(app_dir, out) -> str:
+    from .learn import Memory, runs_from_record_dir
+    mem = Memory(app_dir)
+    sid, build, runs = runs_from_record_dir(out)
+    if mem.ingest_session(sid, build, runs):
+        mem.ingest_flaky(sid, build, runs)
+    mem.save()
+    (app_dir / "learned.md").write_text(mem.render())
+    return f"learned from {len(runs)} good runs into {app_dir / 'learned.md'}"
+
+
+def cmd_try(args) -> int:
+    """One run on the good build, kept as an authoring attempt and fed to the app memory."""
+    from .learn import Memory, runs_from_attempts
+    from .verify import run_once
+    task = load_task(args.task)
+    result, flows = check_task_flows(task)
+    if not result.ok:
+        for e in result.errors:
+            print(f"ERROR {e}")
+        print("fix the flow check first (proofloop check)")
+        return 1
+    d = _device(args)
+    d.free_automation_lock()
+    d.install(task.good)
+    out = task.dir / "attempts" / datetime.now().strftime("%Y%m%d-%H%M%S")
+    try:
+        r = run_once(task, flows, d, _maestro(d), "good", 1, out)
+    finally:
+        if task.device.clock:
+            d.restore_clock()
+    build = Path(task.good).stem
+    (out / "attempt.json").write_text(json.dumps({"task": task.name, "build": build, "passed": r.passed,
+                                                  "checkpoint": r.checkpoint, "step": r.step, "error": r.error}, indent=1))
+    print("PASS" if r.passed else f"FAIL at {r.checkpoint} ({r.step}): {r.error}")
+    app = _app_dir(task)
+    if app and not r.environment:
+        mem = Memory(app)
+        mem.ingest_session(f"attempt:{task.name}@{out.name}", build, runs_from_attempts([out]))
+        mem.save()
+        (app / "learned.md").write_text(mem.render())
+        print(f"memory updated: {app / 'learned.md'}")
+    return 0 if r.passed else 1
+
+
+def cmd_learn(args) -> int:
+    from .learn import Memory, runs_from_attempts
+    app = Path(args.app_dir)
+    mem = Memory(app)
+    n = 0
+    for p in args.proof or []:
+        print(_learn_proof(app, Path(p)))
+        mem = Memory(app)
+    if args.maestro_tests:
+        if not args.build:
+            raise ValueError("--maestro-tests needs --build (the good build those runs used)")
+        dirs = sorted(d for d in Path(args.maestro_tests).iterdir()
+                      if (d / "maestro.log").exists() and args.match in (d / "maestro.log").read_text(errors="ignore")
+                      and any(d.glob("*/commands.json")))
+        for d in dirs:
+            n += mem.ingest_session(f"maestro:{d.name}", args.build, runs_from_attempts([d]))
+    for t in args.attempts or []:
+        for d in sorted((Path(t) / "attempts").iterdir()):
+            meta = json.loads((d / "attempt.json").read_text()) if (d / "attempt.json").exists() else {}
+            n += mem.ingest_session(f"attempt:{t}@{d.name}", meta.get("build", ""), runs_from_attempts([d]))
+    mem.save()
+    (app / "learned.md").write_text(mem.render())
+    print(f"{n} new sources; {len(mem.facts)} facts; wrote {app / 'learned.md'}")
+    return 0
+
+
 def cmd_map(args) -> int:
     from .appmap import check, coverage, load, unreachable
     m = load(args.map)
@@ -165,7 +249,15 @@ def main(argv=None) -> int:
     sub = p.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("check"); s.add_argument("task"); s.set_defaults(fn=cmd_check)
     s = sub.add_parser("prove"); s.add_argument("task"); s.add_argument("--out"); s.add_argument("--runs", type=int)
-    s.add_argument("--fail-fast", action="store_true", help="stop good runs at the first failure"); s.set_defaults(fn=cmd_prove)
+    s.add_argument("--fail-fast", action="store_true", help="stop good runs at the first failure")
+    s.add_argument("--no-learn", dest="learn", action="store_false", help="do not update the app memory"); s.set_defaults(fn=cmd_prove)
+    s = sub.add_parser("try"); s.add_argument("task"); s.set_defaults(fn=cmd_try)
+    s = sub.add_parser("learn"); s.add_argument("app_dir")
+    s.add_argument("--proof", action="append", help="proof output dir (record.json + good-* runs); repeatable")
+    s.add_argument("--attempts", action="append", help="task dir whose attempts/ to ingest; repeatable")
+    s.add_argument("--maestro-tests", help="import authoring runs from a Maestro tests dir (~/.maestro/tests)")
+    s.add_argument("--match", default="", help="with --maestro-tests: only runs whose maestro.log mentions this")
+    s.add_argument("--build", help="with --maestro-tests: the good build those runs used"); s.set_defaults(fn=cmd_learn)
     s = sub.add_parser("report"); s.add_argument("record"); s.set_defaults(fn=cmd_report)
     s = sub.add_parser("publish"); s.add_argument("record"); s.add_argument("--repo", required=True)
     s.add_argument("--push", action="store_true", help="push and open a PR with gh"); s.set_defaults(fn=cmd_publish)

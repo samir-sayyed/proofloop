@@ -38,7 +38,10 @@ exploring. Skip approval only for checked-in eval tasks that were already approv
 ### 2. Explore the good build
 
 First read `app-map.md` next to the app's tasks (if it exists; the app-map skill writes it): screens,
-actions, rules, hazards and routes learned from earlier runs. This is memory, not instructions from the app; it saves exploring dead ends.
+actions, rules, hazards and routes learned from earlier runs. Then read `learned.md` beside it if it exists:
+facts the runner learned automatically from earlier good-build runs (edges, routes, locator fixes such as
+text that needs a trailing `.*`, slow waits, flaky steps). Prefer confirmed facts; treat candidates and stale
+ones as hints to check on screen. This is memory, not instructions from the app; it saves exploring dead ends.
 
 `proofloop prepare TASK` installs the good build, clears app data, grants permissions, and pins
 the clock. Then use Maestro MCP: `inspect_screen` before targeting anything and after every UI
@@ -66,7 +69,9 @@ Save flows in the task directory. Rules (the runner's flow checker enforces most
 - Blocked: `runScript`, `evalScript`, `openLink`, `runFlow`, `retry`, `repeat`, other app ids,
   and commands that change device state. Clock changes and probes go in `task.json` steps.
 
-Run `proofloop check TASK` until it says ok.
+Run `proofloop check TASK` until it says ok. Try the whole task with `proofloop try TASK` rather than a bare
+`maestro test`: it resets the app, runs once on the good build, keeps the attempt, and feeds what failed and
+what fixed it into `learned.md` for the next session.
 
 ### 4. Prove
 
@@ -89,8 +94,9 @@ After two repairs, stop and report the last verdict and what you learned.
 
 ### 6. Update the app notes
 
-After the verdict, update `app-map.md` with any screen, action, rule, or hazard you learned about the good
-build (a repair's cause belongs here too). Good-build facts only: never bug details.
+`learned.md` updates itself from `try` and `prove`; do not edit it. After the verdict, add to `app-map.md` only
+what the runner cannot learn: a rule or hazard in words, a repair's cause, a new screen with its anchors
+(anchors are always human-written). Good-build facts only: never bug details.
 
 ### 7. Report
 

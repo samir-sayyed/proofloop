@@ -156,6 +156,8 @@ minutes. Use `--runs 3` for a fast provisional sweep. The task files point at AP
 | `proofloop restore-clock` | Restore automatic time and time zone. |
 | `proofloop probe` | Print the device's sound state (read-only). |
 | `proofloop map MAP [FLOWS...]` | Check an app map; with flow files or folders, list screens and actions no flow covers. |
+| `proofloop try TASK` | Run the task once on the good build, keep the attempt, and learn from it (use instead of bare `maestro test`). |
+| `proofloop learn APP_DIR [--proof D] [--attempts TASK] [--maestro-tests DIR --match S --build B]` | Learn app memory from proofs, kept attempts, or earlier Maestro sessions; writes `app-memory.json` and `learned.md`. |
 | `proofloop doctor` | Check adb, a device, Maestro and free space. |
 
 Global option: `--device SERIAL` (default: the only connected device). Exit codes: 0 proven or ok,
@@ -278,6 +280,20 @@ checks the format, flags screens nothing leads to, and lists screens and actions
 matching, not execution). Maps of both sample apps: [Sunflower](tasks/sunflower/app-map.md),
 [Quiet Hours](tasks/quiet-hours/app-map.md). Maps hold facts about the good build only, never bug details.
 
+### Self-learning memory
+
+The map is written by people; `learned.md` beside it is written by the runner. Every `proofloop try` and every
+`proofloop prove` (good-build runs only) feeds a ledger, `app-memory.json`, from which the runner renders what it
+has learned: edges between screens, multi-tap routes, locator fixes (text that failed exactly and passed as a
+pattern), slow waits and flaky steps. A fact is a candidate until re-observed, is contradicted when the exact text
+later passes, and goes stale when a newer build shows its screen without it. Bug-build runs are never read, and
+learned facts never become anchors.
+
+In a live test, three fresh authors given the original map plus memory learned automatically from one earlier
+author's attempts all avoided the failure that every author with the original map hit, and all three tests were
+proven ([experiments/memory-loop](experiments/memory-loop/README.md)). Design and trade-offs:
+[docs/adr/0004](docs/adr/0004-self-learning-app-memory.md).
+
 ## Verdicts
 
 | Verdict | Meaning |
@@ -329,6 +345,9 @@ logging `maestro` wrapper and a reset script (no bug builds, no existing flows),
 - [experiments/map-effect](experiments/map-effect/README.md): 12 trials on Sunflower, with and without the
   app map. The map roughly halved time and tool calls and did not change whether tests were proven. Round 1
   (no flow checker rule): 0 of 6 proven, all hid the bug behind a wait. Round 2 (with the rule): 6 of 6 proven.
+- [experiments/memory-loop](experiments/memory-loop/README.md): the same transfer with no hand-written
+  update. Memory learned automatically from one author's attempts: 0 of 3 later authors failed on the learned
+  quirk (original map: 3 of 3), all proven.
 - [experiments/quiet-hours-loop](experiments/quiet-hours-loop/README.md): a first author's write-back added a
   fact to the map (multi-line text needs a regex); 3 later authors with the grown map avoided the failure that
   all 3 with the original map hit (79-111 s vs 134-139 s). The write-back author's flow is now the fourth task.
