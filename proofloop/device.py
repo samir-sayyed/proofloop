@@ -79,7 +79,8 @@ class AdbDevice:
             free = self.free_mb()
             if 0 <= free < need:
                 raise DeviceError(f"device has {free} MB free on /data; need about {need} MB to install {os.path.basename(str(apk))}")
-        r = subprocess.run([self.adb, "-s", self.serial, "install", "-r", str(apk)],
+        # -d: an older build (a seeded-bug build, or the commit before a fix) can be installed over a newer one
+        r = subprocess.run([self.adb, "-s", self.serial, "install", "-r", "-d", str(apk)],
                            capture_output=True, text=True, timeout=300)
         if r.returncode != 0 or "Success" not in r.stdout:
             raise DeviceError(f"install {os.path.basename(str(apk))} failed: {(r.stderr or r.stdout).strip()}")

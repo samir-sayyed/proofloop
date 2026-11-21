@@ -79,6 +79,16 @@ class InstallSpace(unittest.TestCase):
             self.assertIn("146 MB free", str(e.exception))  # 150000 KB
             self.assertIn("pm trim-caches 4G", d.log)
 
+    def test_install_allows_downgrade(self):
+        with tempfile.TemporaryDirectory() as t:
+            apk = Path(t) / "a.apk"
+            apk.write_bytes(b"0")
+            d = StubDevice([("df -k /data", "Filesystem 1K-blocks Used Available\n/dev/x 6000000 1000000 5000000\n")])
+            with mock.patch("proofloop.device.subprocess.run",
+                            return_value=mock.Mock(returncode=0, stdout="Success", stderr="")) as run:
+                d.install(str(apk))
+            self.assertIn("-d", run.call_args[0][0])
+
 
 if __name__ == "__main__":
     unittest.main()
