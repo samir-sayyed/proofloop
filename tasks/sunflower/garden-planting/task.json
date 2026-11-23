@@ -2,7 +2,7 @@
   "name": "sunflower/garden-planting",
   "criterion": "Adding a plant to the garden lists it on the My garden tab with today's planting date.",
   "app_id": "com.google.samples.apps.sunflower",
-  "approved_by": "Samir, 2026-11-23",
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; plan.md unchanged since Samir's own approval), 2026-11-23",
   "good": "../../../.scratch/proofloop/apks/sunflower-good.apk",
   "bugs": [
     {
@@ -34,5 +34,6 @@
       "change": "wait for the 'Plant list' tab, present in every state; no checkpoint changed"
     }
   ],
-  "approved_plan": "sha256:035786307f586d852b4265a9e973981187d1862c31a0a0f35d8ecb897e94ea1f"
+  "approved_plan": "sha256:035786307f586d852b4265a9e973981187d1862c31a0a0f35d8ecb897e94ea1f",
+  "approved_bugs": "sha256:d2b60218152bf1c6c6cf6efd74c2b254d8b4a8477858ecef6a9c6de6f89ab7fd"
 }

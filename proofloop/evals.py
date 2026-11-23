@@ -35,7 +35,7 @@ def run_eval(root: Path, device, maestro, out: Path, good_runs: int | None = Non
 
 def table(records: list[dict], config: str = "") -> str:
     rows = ["| Task | Verdict | Good passes | Proof bugs caught | Held-out caught | Fallbacks | Repairs | Author | "
-            "Author tokens | Minutes |",
+            "Author context | Minutes |",
             "|---|---|---|---|---|---|---|---|---|---|"]
     tot = {"tasks": 0, "proven": 0, "proof": 0, "proof_caught": 0, "held": 0, "held_caught": 0, "runs": 0, "passes": 0,
            "repairs": 0, "tokens": 0, "minutes": 0.0}
@@ -44,7 +44,7 @@ def table(records: list[dict], config: str = "") -> str:
         held = [b for b in r["bugs"] if b["role"] == "held_out"]
         g = r["good"]
         a, u = r.get("author") or {}, r.get("author_usage")
-        tokens = (u or {}).get("total") or int(a.get("tokens") or 0)
+        tokens = (u or {}).get("peak_context") or int(a.get("tokens") or 0)  # comparable with reported subagent tokens
         rows.append(f"| {r['task']} | {r['verdict']} | {g.get('passes', 0)}/{len(g['runs'])} | "
                     f"{sum(b['caught'] for b in proof)}/{len(proof)} | {sum(b['caught'] for b in held)}/{len(held)} | "
                     f"{len(r['flow_check']['coordinate_fallbacks'])} | {len(r.get('repairs') or [])} | "
@@ -64,7 +64,7 @@ def table(records: list[dict], config: str = "") -> str:
                f"held-out bug-catch rate {tot['held_caught']}/{tot['held']}, "
                f"good-build flake rate {flake:.1%} over {tot['runs']} runs, {tot['repairs']} repairs, "
                f"{tot['minutes']:.1f} runner minutes"
-               + (f", {tot['tokens'] / 1000:.0f}k author tokens"
+               + (f", {tot['tokens'] / 1000:.0f}k author context"
                   + (f" ({tot['tokens'] / 1000 / tot['proven']:.0f}k per proven test)" if tot["proven"] else "")
                   if tot["tokens"] else "") + ".", ""]
     return "\n".join(summary + rows) + "\n"

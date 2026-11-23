@@ -75,6 +75,12 @@ class Retro(unittest.TestCase):
         self.assertEqual(cause(rec("rejected_missed_bug", "t", bugs=[self.bug(True, None)])), "not_observed")
         self.assertEqual(cause(rec("rejected_missed_bug", "t", bugs=[self.bug(False, "C1")])), "wrong_checkpoint")
         self.assertEqual(cause(rec("rejected_flaky", "t", label="bad_locator")), "locator")
+        broke = rec("rejected_flaky", "t", runs=3, label="flaky")
+        for x in broke["good"]["runs"]:
+            x.update(passed=False, checkpoint="setup", step="flow.yaml:13 extendedWaitUntil")
+        self.assertEqual(cause(broke), "broken_setup")
+        broke["good"]["runs"][0]["passed"] = True
+        self.assertEqual(cause(broke), "flaky")
         self.assertEqual(cause(rec("needs_human", "t", reason="plan.md changed since it was approved")), "approval")
 
     def test_recurring_causes_are_grouped_with_their_fix(self):

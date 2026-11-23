@@ -2,12 +2,12 @@
   "name": "quiet-hours/next-start-saved-screen",
   "criterion": "After a Weekdays schedule is activated on a Wednesday morning, the Routine saved screen states the next start as today at 9:00 AM.",
   "app_id": "com.sam.quiethours",
-  "approved_by": "Samir, 2026-11-23",
-  "good": "../../../.scratch/proofloop/apks/good-e4ba3eb.apk",
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; plan.md unchanged since Samir's own approval), 2026-11-23",
+  "good": "../../../.scratch/proofloop/apks/good-b41de64.apk",
   "bugs": [
     {
       "name": "next-skips-today",
-      "apk": "../../../.scratch/proofloop/apks/bug-next-skips-today-e4ba3eb.apk",
+      "apk": "../../../.scratch/proofloop/apks/bug-next-skips-today-b41de64.apk",
       "role": "proof",
       "expect": "A2"
     }
@@ -26,5 +26,16 @@
       "flow": "flow.yaml"
     }
   ],
-  "approved_plan": "sha256:077f36fa71e68a2e2f829bb59985569878443235c038ae79f9c2ced6618a7f1a"
+  "approved_plan": "sha256:077f36fa71e68a2e2f829bb59985569878443235c038ae79f9c2ced6618a7f1a",
+  "approved_bugs": "sha256:11ba13e890617c41a83386378f34264812ca379f75d8cb7795a1cb0d4dfb7ac8",
+  "repairs": [
+    {
+      "reason": "re-proved on main b41de64 (2026-11-23): 0/10 good runs; one-time tip bubbles from PR #76 dim Home and the wizard, so 'Manage your sound profiles' and 'Step 1/2 of 2' were not visible",
+      "change": "optional taps on \"Skip|Got it\" before the waits the bubbles block (no runFlow: the app repo's own fix used runFlow when:, which the allowlist blocks); no checkpoint or assertion changed"
+    },
+    {
+      "reason": "re-proof after the first repair: 4/10, the 'Schedule Details' wait sometimes landed behind a wizard tip (timing race)",
+      "change": "the same optional \"Skip|Got it\" taps before that wait; no checkpoint or assertion changed"
+    }
+  ]
 }

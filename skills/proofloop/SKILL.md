@@ -35,7 +35,9 @@ in the task directory, one per line starting with its id: `- C1 the wizard opens
 criterion cannot be observed through the UI or a probe, say so and stop; do not write a hollow test.
 
 Ask the human to approve or edit the plan before exploring. **The human runs
-`proofloop approve TASK --by NAME`**; you never run it. It binds the approval to this exact `plan.md`.
+`proofloop approve TASK --by NAME`**; you never run it, unless the human has delegated approval to you in
+this conversation in their own words. Then run it with `--by "agent (delegated by NAME in chat, DATE)"`, so the
+record shows a delegation, not a review. It binds the approval to this exact `plan.md`.
 `prove` returns `needs_human` if `plan.md` changes afterwards, or if the flows and probes declare
 checkpoint ids that differ from the plan's. So use exactly the approved ids in your
 `# checkpoint:` markers. If a repair needs a checkpoint added, dropped or reworded, edit `plan.md`
@@ -75,11 +77,17 @@ Save flows in the task directory. Rules (the runner's flow checker enforces most
 - Blocked: `runScript`, `evalScript`, `openLink`, `runFlow`, `retry`, `repeat`, other app ids,
   and commands that change device state. Clock changes and probes go in `task.json` steps.
 
-Run `proofloop check TASK` until it says ok. Try the whole task with `proofloop try TASK` rather than a bare
+Run `proofloop check --fix TASK` until it says ok: it applies the mechanical fixes (`launchApp` options, a
+marker moved above the wait that gates it) and reports the rest. A checkpoint that only repeats text already
+checked with no action in between is rejected: assert something the step under test changes. Try the whole task with `proofloop try TASK` rather than a bare
 `maestro test`: it resets the app, runs once on the good build, keeps the attempt, and feeds what failed and
 what fixed it into `learned.md` for the next session.
 
 ### 4. Prove
+
+Record yourself in `task.json` before proving: `"author": {"agent": "claude-code", "model": "<your model>",
+"session": "<your session id>"}`. `prove` reads your token use from the transcript into the record.
+
 
 `proofloop prove TASK`. It runs the good build once, then each proof bug once, then the remaining
 good runs (skipped if a proof bug was missed), then held-out bugs, all from a clean reset. It writes

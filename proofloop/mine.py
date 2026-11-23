@@ -30,8 +30,12 @@ def words(text: str) -> set[str]:
     return {w for w in re.findall(r"[a-z]{3,}", re.sub(r"([a-z])([A-Z])", r"\1 \2", text).lower()) if w not in STOP}
 
 
-def fix_commits(repo, criterion: str = "", limit: int = 15, since: str | None = None) -> list[dict]:
-    """Candidate fix commits, best first: source-only, small, and (with a criterion) on topic."""
+def fix_commits(repo, criterion: str = "", limit: int = 15, since: str | None = None, after: str | None = None) -> list[dict]:
+    """Candidate fix commits, best first: source-only, small, and (with a criterion) on topic.
+
+    after: only fixes whose parent already contains this commit (the task's good build). Otherwise the parent
+    can lack other, older fixes and be "caught" for a bug it was not mined for.
+    """
     args = ["log", "--no-merges", "-i", "-E", "--grep=(fix|bug|crash|regress|broken|wrong|incorrect)", "--format=%H%x09%P%x09%ad%x09%s", "--date=short"]
     if since:
         args.append(f"--since={since}")
@@ -45,6 +49,9 @@ def fix_commits(repo, criterion: str = "", limit: int = 15, since: str | None = 
         src = [f for f in files if SOURCE.search(f) and not TEST_PATH.search(f)]
         if not src:
             continue  # docs, build or test-only change: its parent is not a behaviour bug
+        if after and subprocess.run(["git", "-C", str(repo), "merge-base", "--is-ancestor", after, parents],
+                                    capture_output=True).returncode != 0:
+            continue  # the parent predates the good build: it differs by more than this bug
         overlap = sorted(want & (words(subject) | {w for f in src for w in words(Path(f).stem)}))
         score = 3 * len(overlap) - min(len(src), 10) / 3 + (1 if any(t in f for f in src for t in ("ui/", "Screen", "ViewModel")) else 0)
         out.append({"sha": sha[:10], "parent": parents[:10], "date": date, "subject": subject, "files": len(src),

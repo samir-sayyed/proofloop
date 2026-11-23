@@ -72,6 +72,43 @@ calls, 3 Maestro calls.
   the fixed one, so this mistake now costs one `check` instead of a full proof run.
 - The app-map skill says routes are navigation only (no state waits).
 
+## Round 3: one-shot baseline and a cheaper author model (2026-11-23)
+
+Same criterion, brief (`brief-v2.md`), map and scoring as round 2's map arm, with the checker of 2026-11-23
+(checkpoint-cannot-fail rule added). Two new arms, three fresh sessions each:
+
+- **One-shot (Sonnet 5.5):** map and checker, **no device**: no `./maestro`, no reset, no APK
+  (`oneshot-addendum.md`). The author writes the flow from the brief and map and stops when `./check.sh` passes.
+- **Haiku 5.5, full loop:** the round-2 map arm with a cheaper model: device, map and checker.
+
+| Trial | Arm | Time | Peak context | Checker runs | Maestro test runs | Good build | Verdict |
+|---|---|---|---|---|---|---|---|
+| 13 | one-shot, Sonnet | 21 s | 76.8k | 2 | 0 | 3/3 | proven |
+| 14 | one-shot, Sonnet | 23 s | 78.2k | 2 | 0 | 3/3 | proven |
+| 15 | one-shot, Sonnet | 21 s | 76.7k | 2 | 0 | 3/3 | proven |
+| 16 | full loop, Haiku | 175 s | 83.2k | 2 | 2 | 3/3 | proven |
+| 17 | full loop, Haiku | 180 s | 83.5k | 3 | 2 | 3/3 | proven |
+| 18 | full loop, Haiku | 215 s | 89.6k | 4 | 2 | 3/3 | proven |
+
+Peak context is the largest single request, read from each session's transcript by `proofloop/cost.py`; it
+matches the per-subagent figure Claude Code reports. Tokens processed across all requests (cache reads
+re-counted every turn) were about 370k per one-shot trial and 700-900k per Haiku trial.
+
+- **Running the app was not needed here.** With the app map and the checker, all three one-shot flows were
+  proven, in about a fifth of the round-2 map arm's time (94 s). The proof gate is what makes this safe: a
+  one-shot flow that was wrong would have been rejected, not merged.
+- **Haiku matched Sonnet's proof rate (3/3)** at roughly twice the wall time and a little more context, with
+  more checker rounds. The verdict does not depend on the author model, so a cheaper author costs only time.
+- **The checkpoint-cannot-fail rule fired** on trials 15 and 17 (a wait on a plant name, then a checkpoint
+  asserting the same name). Both authors fixed it in one step.
+- One-shot trial 13 waited on the shared "Plant list" tab right before C1. The bug was still caught at C1:
+  an anchor wait cannot hide a bug, shared or not. A stricter rule that refused shared anchors was tried and
+  reverted (it added checker rounds, not catches).
+
+What this does not show: one criterion on one small app whose map was written after a flow for it existed,
+three trials per arm. A one-shot author on an unmapped screen has nothing to go on. The cheaper-model result
+is for a short, well-mapped flow.
+
 ## Limits
 
 - n=3 per arm per round, one app, one criterion, one author model: the time and call differences are suggestive, not

@@ -14,18 +14,49 @@ appId: com.sam.quiethours
     visible: "Your 3-day Premium trial"
     timeout: 10000
 - tapOn: "Continue"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 - extendedWaitUntil:
     visible: "Manage your sound profiles"
     timeout: 15000
 - tapOn: "Add Schedule"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 - extendedWaitUntil:
     visible: "Schedule Details"
     timeout: 10000
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 - tapOn: "Schedule Title"
 - inputText: "Smoke"
 - hideKeyboard
 - tapOn: "Weekdays"
 - tapOn: "Next"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 # checkpoint: A1 the wizard review step is shown
 - extendedWaitUntil:
     visible: "Step 2 of 2"

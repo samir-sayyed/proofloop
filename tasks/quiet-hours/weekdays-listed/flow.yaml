@@ -10,20 +10,61 @@ appId: com.sam.quiethours
 - tapOn: "Get Started"
 - tapOn: "Explore App"
 - tapOn: "Continue"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 - extendedWaitUntil:
     visible: "Manage your sound profiles"
     timeout: 10000
 - tapOn: "Add Schedule"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 # checkpoint: C1 the wizard opens from "Add Schedule"
 - assertVisible: "Step 1 of 2"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 - tapOn: "Schedule Title"
 - inputText: "Smoke"
 - hideKeyboard
 - tapOn: "Weekdays"
 - tapOn: "Next"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 - assertVisible: "Step 2 of 2"
 - tapOn: "Activate"
 - tapOn: "Done"
+# One-time tip bubbles (Quiet Hours 5.3.4+, PR #76) dim the screen until dismissed; older builds have none.
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
+- tapOn:
+    text: "Skip|Got it"
+    optional: true
 - extendedWaitUntil:
     visible: "Manage your sound profiles"
     timeout: 10000

@@ -192,6 +192,54 @@
    "build": "good-e4ba3eb",
    "runs": 1,
    "when": "20261121125647"
+  },
+  {
+   "id": "attempt:quiet-hours/weekdays-listed@20261123-120256",
+   "build": "good-b41de64",
+   "runs": 1,
+   "when": "20261123120256"
+  },
+  {
+   "id": "attempt:quiet-hours/weekdays-listed@20261123-120439",
+   "build": "good-b41de64",
+   "runs": 1,
+   "when": "20261123120439"
+  },
+  {
+   "id": "attempt:quiet-hours/weekdays-listed@20261123-120623",
+   "build": "good-b41de64",
+   "runs": 1,
+   "when": "20261123120623"
+  },
+  {
+   "id": "attempt:quiet-hours/next-start-saved-screen@20261123-120714",
+   "build": "good-b41de64",
+   "runs": 1,
+   "when": "20261123120714"
+  },
+  {
+   "id": "attempt:quiet-hours/end-restores-sound@20261123-120819",
+   "build": "good-b41de64",
+   "runs": 1,
+   "when": "20261123120819"
+  },
+  {
+   "id": "attempt:quiet-hours/weekdays-listed@20261123-121041",
+   "build": "good-b41de64",
+   "runs": 1,
+   "when": "20261123121041"
+  },
+  {
+   "id": "attempt:quiet-hours/end-restores-sound@20261123-121159",
+   "build": "good-b41de64",
+   "runs": 1,
+   "when": "20261123121159"
+  },
+  {
+   "id": "proof:quiet-hours/next-start-saved-screen@2026-11-23T12:55:44",
+   "build": "good-b41de64",
+   "runs": 10,
+   "when": "20261123125544"
   }
  ],
  "facts": {
@@ -227,12 +275,15 @@
     "maestro:2026-11-21_130144",
     "maestro:2026-11-21_131127",
     "maestro:2026-11-21_131200",
-    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647",
+    "attempt:quiet-hours/next-start-saved-screen@20261123-120714",
+    "proof:quiet-hours/next-start-saved-screen@2026-11-23T12:55:44"
    ],
    "builds": [
-    "good-e4ba3eb"
+    "good-e4ba3eb",
+    "good-b41de64"
    ],
-   "runs": 25
+   "runs": 36
   },
   "edge|routine_picker|Explore App|trial": {
    "kind": "edge",
@@ -263,12 +314,15 @@
     "maestro:2026-11-21_130144",
     "maestro:2026-11-21_131127",
     "maestro:2026-11-21_131200",
-    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647"
+    "attempt:tasks/quiet-hours/next-start-saved-screen@20261121-125647",
+    "attempt:quiet-hours/next-start-saved-screen@20261123-120714",
+    "proof:quiet-hours/next-start-saved-screen@2026-11-23T12:55:44"
    ],
    "builds": [
-    "good-e4ba3eb"
+    "good-e4ba3eb",
+    "good-b41de64"
    ],
-   "runs": 22
+   "runs": 33
   },
   "edge|trial|Continue|home": {
    "kind": "edge",
@@ -500,7 +554,15 @@
    "wizard_details",
    "wizard_review",
    "saved"
+  ],
+  "good-b41de64": [
+   "welcome",
+   "routine_picker",
+   "trial"
   ]
  },
- "pending": {}
+ "pending": {
+  "Manage your sound profiles": "welcome"
+ },
+ "current_build": null
 }

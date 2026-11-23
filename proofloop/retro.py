@@ -24,6 +24,9 @@ CAUSES = {
                           "assert the state before acting on it, inside the checkpoint"),
     "locator": ("good runs failed finding an element",
                 "check learned.md locator fixes (multi-line text needs a trailing .*) and wait timeouts"),
+    "broken_setup": ("every good run failed at the same step before any checkpoint",
+                     "deterministic, not flaky: the app or device changed under the test (a new screen, overlay or "
+                     "onboarding step); repair navigation, re-prove, and read proofloop history for the build it broke on"),
     "flaky": ("good runs failed some of the time", "read the evidence; harness causes are common (see docs/what-failed.md)"),
     "real_bug": ("good runs failed at the same checkpoint every time", "the app may have a real bug: report it"),
     "environment": ("device or Maestro failure", "harness, not the test: proofloop doctor"),
@@ -43,6 +46,10 @@ def cause(r: dict) -> str:
                     return "not_observed"
                 return {"setup": "hidden_by_setup", "action": "tripped_on_action"}.get(res["checkpoint"], "wrong_checkpoint")
     if v == "rejected_flaky":
+        runs = r.get("good", {}).get("runs", [])
+        if runs and all(not x["passed"] and x["checkpoint"] in ("setup", "action") for x in runs) \
+                and len({x["step"] for x in runs}) == 1:
+            return "broken_setup"
         return {"bad_locator": "locator", "real_bug_in_good_build": "real_bug"}.get(label, "flaky")
     if v == "blocked_environment":
         return "environment"

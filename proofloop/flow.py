@@ -268,20 +268,18 @@ def _vacuous_checkpoints(flow: Flow) -> list[str]:
 
 
 def task_anchors(task) -> frozenset[str]:
-    """Screen anchors from tasks/<app>/app-map.md that may exempt a wait from the checkpoint rule.
-
-    Only anchors unique to one screen count: a wait on a tab label visible on two screens says nothing
-    about where the app is (a one-shot author waited on Sunflower's "Plant list" tab right before C1).
-    """
+    """Screen anchors from tasks/<app>/app-map.md; a wait on one may sit outside a checkpoint."""
     map_path = task.dir.parent / "app-map.md"
     return map_anchors(map_path) if map_path.exists() else frozenset()
 
 
 def map_anchors(map_path) -> frozenset[str]:
-    from .appmap import ambiguous_anchors, load
-    m = load(map_path)
-    shared = {a for (_, a) in ambiguous_anchors(m)}
-    return frozenset(a for s in m.screens.values() for a in s.anchors if a not in shared)
+    """All anchors, shared ones included: an anchor wait cannot hide a bug however many screens show it (a
+    one-shot author's wait on Sunflower's shared "Plant list" tab before C1 was still proven, bug caught at C1).
+    Excluding shared anchors here was tried and reverted: it added checker rounds, not catches. The learner
+    does exclude them, because there they decide which screen the app is on."""
+    from .appmap import load
+    return frozenset(a for s in load(map_path).screens.values() for a in s.anchors)
 
 
 def check_task_flows(task) -> tuple[CheckResult, dict[str, Flow]]:

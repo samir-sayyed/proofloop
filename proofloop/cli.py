@@ -125,7 +125,7 @@ def cmd_history(args) -> int:
 def cmd_mine(args) -> int:
     from .mine import fix_commits
     crit = load_task(args.task).criterion if args.task else ""
-    rows = fix_commits(Path(args.repo), crit, limit=args.limit, since=args.since)
+    rows = fix_commits(Path(args.repo), crit, limit=args.limit, since=args.since, after=args.after)
     for c in rows:
         on = f" on topic: {', '.join(c['overlap'])}" if c["overlap"] else ""
         print(f"{c['sha']}  parent {c['parent']}  {c['date']}  {c['files']} files  score {c['score']:>5}  {c['subject']}{on}")
@@ -365,7 +365,9 @@ def main(argv=None) -> int:
     s.add_argument("task"); s.set_defaults(fn=cmd_history)
     s = sub.add_parser("mine-bugs", help="list fix commits whose parent can serve as a real held-out bug")
     s.add_argument("repo"); s.add_argument("--task", help="rank by overlap with this task's criterion")
-    s.add_argument("--limit", type=int, default=15); s.add_argument("--since"); s.set_defaults(fn=cmd_mine)
+    s.add_argument("--limit", type=int, default=15); s.add_argument("--since")
+    s.add_argument("--after", help="only fixes whose parent contains this commit (the good build)")
+    s.set_defaults(fn=cmd_mine)
     s = sub.add_parser("retro", help="group rejected proofs by cause and name the rule or step for each")
     s.add_argument("paths", nargs="+"); s.set_defaults(fn=cmd_retro)
     s = sub.add_parser("next", help="backfill queue: app-map rules, screens and actions no flow covers yet")

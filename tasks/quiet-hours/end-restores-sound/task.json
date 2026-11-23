@@ -2,12 +2,12 @@
   "name": "quiet-hours/end-restores-sound",
   "criterion": "A Silent schedule restores normal sound at its end time, and Home shows it active during the window and the next start after it.",
   "app_id": "com.sam.quiethours",
-  "approved_by": "Samir, 2026-11-23",
-  "good": "../../../.scratch/proofloop/apks/good-e4ba3eb.apk",
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; dropped pre-fix-3cdc546: it predates the good build, see mine-bugs --after), 2026-11-23",
+  "good": "../../../.scratch/proofloop/apks/good-b41de64.apk",
   "bugs": [
     {
       "name": "end-hour-late",
-      "apk": "../../../.scratch/proofloop/apks/bug-end-hour-late-e4ba3eb.apk",
+      "apk": "../../../.scratch/proofloop/apks/bug-end-hour-late-b41de64.apk",
       "role": "proof",
       "expect": "E2"
     },
@@ -20,8 +20,14 @@
     },
     {
       "name": "end-5min-early",
-      "apk": "../../../.scratch/proofloop/apks/bug-end-5min-early-e4ba3eb.apk",
+      "apk": "../../../.scratch/proofloop/apks/bug-end-5min-early-b41de64.apk",
       "role": "held_out"
+    },
+    {
+      "name": "pre-fix-bcef12f",
+      "apk": "../../../.scratch/proofloop/apks/good-bcef12f.apk",
+      "role": "held_out",
+      "note": "mined: the commit before 2123448 'VIP boost no longer switches Do Not Disturb off for the rest of the window'"
     }
   ],
   "device": {
@@ -81,7 +87,12 @@
     {
       "reason": "status flows force-stopped the app and cancelled its END alarm",
       "change": "launchApp stopApp: false; force-stop blocked by the flow checker"
+    },
+    {
+      "reason": "re-proved on main b41de64 (2026-11-23): 0/10 good runs; one-time tip bubbles from PR #76 dim Home and the wizard, so 'Manage your sound profiles' and 'Step 1/2 of 2' were not visible",
+      "change": "optional taps on \"Skip|Got it\" before the waits the bubbles block (no runFlow: the app repo's own fix used runFlow when:, which the allowlist blocks); no checkpoint or assertion changed"
     }
   ],
-  "approved_plan": "sha256:4102b105dc335e83ec97bc9b04f41594c621625712cca873e207774bee9d7ec1"
+  "approved_plan": "sha256:4102b105dc335e83ec97bc9b04f41594c621625712cca873e207774bee9d7ec1",
+  "approved_bugs": "sha256:5b5e1cdd00b6650a0a3e769bc2773920b6544136159dd0d33fa5abaf543dba00"
 }

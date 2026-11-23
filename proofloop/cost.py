@@ -50,7 +50,11 @@ def session_usage(session: str, root: Path = ROOT) -> dict | None:
         total["cache_write"] += u.get("cache_creation_input_tokens", 0) or 0
         total["cache_read"] += u.get("cache_read_input_tokens", 0) or 0
         total["output"] += u.get("output_tokens", 0) or 0
-    total["total"] = sum(total.values())
+    total["total"] = sum(total.values())  # tokens processed across all requests (cache reads re-count context)
+    # largest single request: the context the session reached, the figure Claude Code reports per subagent
+    total["peak_context"] = max((u.get("input_tokens", 0) or 0) + (u.get("cache_creation_input_tokens", 0) or 0)
+                                + (u.get("cache_read_input_tokens", 0) or 0) + (u.get("output_tokens", 0) or 0)
+                                for u in per_request.values())
     total["requests"] = len(per_request)
     total["models"] = sorted(models)
     total["transcript"] = str(path)

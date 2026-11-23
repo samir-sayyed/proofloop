@@ -2,18 +2,18 @@
   "name": "quiet-hours/weekdays-listed",
   "criterion": "Creating a Weekdays schedule and activating it shows it on Home with its title, 'Weekdays', and the correct next start.",
   "app_id": "com.sam.quiethours",
-  "approved_by": "Samir, 2026-11-23",
-  "good": "../../../.scratch/proofloop/apks/good-e4ba3eb.apk",
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; plan.md unchanged since Samir's own approval), 2026-11-23",
+  "good": "../../../.scratch/proofloop/apks/good-b41de64.apk",
   "bugs": [
     {
       "name": "weekdays-off-by-one",
-      "apk": "../../../.scratch/proofloop/apks/bug-weekdays-off-by-one-e4ba3eb.apk",
+      "apk": "../../../.scratch/proofloop/apks/bug-weekdays-off-by-one-b41de64.apk",
       "role": "proof",
       "expect": "C3"
     },
     {
       "name": "next-skips-today",
-      "apk": "../../../.scratch/proofloop/apks/bug-next-skips-today-e4ba3eb.apk",
+      "apk": "../../../.scratch/proofloop/apks/bug-next-skips-today-b41de64.apk",
       "role": "held_out"
     }
   ],
@@ -39,7 +39,12 @@
     {
       "reason": "launch right after clearing data was killed by the pending task removal",
       "change": "clean state moved out of the flow into the runner's reset, which waits for the old task to go"
+    },
+    {
+      "reason": "re-proved on main b41de64 (2026-11-23): 0/10 good runs; one-time tip bubbles from PR #76 dim Home and the wizard, so 'Manage your sound profiles' and 'Step 1/2 of 2' were not visible",
+      "change": "optional taps on \"Skip|Got it\" before the waits the bubbles block (no runFlow: the app repo's own fix used runFlow when:, which the allowlist blocks); no checkpoint or assertion changed"
     }
   ],
-  "approved_plan": "sha256:c84772d0aa9c95a51e5bac83f3e690bcc4e72b2088098a82047eda30029c930e"
+  "approved_plan": "sha256:c84772d0aa9c95a51e5bac83f3e690bcc4e72b2088098a82047eda30029c930e",
+  "approved_bugs": "sha256:c16b762e43de9412ca5738a991d2fa09d2951dd120dd97675d920c7e56642087"
 }

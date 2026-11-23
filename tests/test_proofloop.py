@@ -368,7 +368,7 @@ class EvidenceAndScale(unittest.TestCase):
                      {"requestId": "r2", "message": {"usage": u(20, 30)}}, {"type": "user"}]
             (tr / "agent-abc.jsonl").write_text("\n".join(json.dumps(x) for x in lines))
             usage = cost.session_usage("abc", Path(root))
-            self.assertEqual((usage["output"], usage["requests"], usage["total"]), (80, 2, 310))
+            self.assertEqual((usage["output"], usage["requests"], usage["total"], usage["peak_context"]), (80, 2, 310, 160))
             self.assertEqual(usage["models"], ["claude-haiku-5-5"])
             old = cost.ROOT
             try:
@@ -378,9 +378,9 @@ class EvidenceAndScale(unittest.TestCase):
             finally:
                 cost.session_usage.__defaults__ = (old,)
             self.assertEqual(rec["author_usage"]["total"], 310)
-            self.assertIn("haiku; 0.3k tokens", render(rec))
+            self.assertIn("haiku; 0.2k peak context, 0k tokens processed", render(rec))
             text = table([rec])
-            self.assertIn("author tokens (0k per proven test)", text)
+            self.assertIn("author context (0k per proven test)", text)
             self.assertIn("| haiku |", text)
 
     def test_publish_refuses_when_review_queue_is_full(self):

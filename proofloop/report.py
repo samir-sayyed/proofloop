@@ -83,7 +83,8 @@ def author_line(record: dict) -> str:
     a, u = record.get("author") or {}, record.get("author_usage")
     who = ", ".join(str(a[k]) for k in ("agent", "model") if a.get(k)) or "not recorded"
     if u:
-        return f"{who}; {u['total'] / 1000:.1f}k tokens ({u['output'] / 1000:.1f}k output, {u['requests']} requests)"
+        return (f"{who}; {u.get('peak_context', 0) / 1000:.1f}k peak context, {u['total'] / 1000:.0f}k tokens processed "
+                f"({u['cache_read'] / 1000:.0f}k cache reads, {u['output'] / 1000:.1f}k output, {u['requests']} requests)")
     if a.get("tokens"):
         return f"{who}; {int(a['tokens']) / 1000:.1f}k tokens (reported)"
     return who + "; model cost not measured (no author session in task.json)"
