@@ -311,6 +311,94 @@ class ApprovalGate(unittest.TestCase):
         self.assertEqual(plan_ids("- S phone silenced\n- Note x\n", {"S"}), {"S"})
 
 
+class RecordingDevice(FakeDevice):
+    def __init__(self, serial="fake", **kw):
+        super().__init__(**kw)
+        self.serial = serial
+        self.snapshots = []
+
+    def start_recording(self): self.calls.append("rec start")
+    def stop_recording(self, dest):
+        self.calls.append("rec stop")
+        Path(dest).write_bytes(b"mp4")
+        return str(dest)
+    def load_snapshot(self, name): self.snapshots.append(name)
+
+
+class EvidenceAndScale(unittest.TestCase):
+    def test_good_run_one_is_recorded_and_reported(self):
+        d = RecordingDevice()
+        rec = TaskDir().prove(d, by_build(proof=fails_at(4)))
+        self.assertTrue(rec["good"]["video"].endswith("good-1/run.mp4"))
+        self.assertEqual(d.calls.count("rec start"), 1)
+        self.assertIn("Video of good run 1", render(rec))
+        rec = TaskDir().prove(RecordingDevice(), by_build(proof=fails_at(4)), video=False)
+        self.assertNotIn("video", rec["good"])
+
+    def test_good_runs_spread_over_extra_devices_and_snapshot_loads_everywhere(self):
+        main, other = RecordingDevice("emulator-5554"), RecordingDevice("emulator-5556")
+        t = TaskDir()
+        rec = prove(load_task(t.path), main, FakeMaestro(main, by_build(proof=fails_at(4))), t.dir / "out",
+                    extra=[(other, FakeMaestro(other, by_build()))], snapshot="clean")
+        self.assertEqual(rec["verdict"], "proven")
+        self.assertEqual([r["run"] for r in rec["good"]["runs"]], list(range(1, 11)))
+        by_dev = {s: [r["run"] for r in rec["good"]["runs"] if r["device"] == s] for s in ("emulator-5554", "emulator-5556")}
+        self.assertEqual(by_dev["emulator-5556"], [3, 5, 7, 9])  # runs 2..10 alternate; run 1 and bugs on main
+        self.assertEqual(main.snapshots, ["clean"]); self.assertEqual(other.snapshots, ["clean"])
+        self.assertIn("plus 1 more for good runs", render(rec))
+        self.assertEqual(other.calls[-1], "restore_clock")
+
+    def test_environment_failure_on_an_extra_device_blocks(self):
+        main, other = RecordingDevice("a"), RecordingDevice("b")
+        t = TaskDir()
+        bad = lambda b, f, n: FlowResult(False, error="driver did not start", environment=True)
+        rec = prove(load_task(t.path), main, FakeMaestro(main, by_build(proof=fails_at(4))), t.dir / "out",
+                    extra=[(other, FakeMaestro(other, bad))])
+        self.assertEqual(rec["verdict"], "blocked_environment")
+
+    def test_author_tokens_come_from_the_session_transcript(self):
+        from proofloop import cost
+        with tempfile.TemporaryDirectory() as root:
+            tr = Path(root) / "proj" / "sess" / "subagents"
+            tr.mkdir(parents=True)
+            u = lambda i, o: {"input_tokens": i, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 100,
+                              "output_tokens": o}
+            lines = [{"requestId": "r1", "message": {"model": "claude-haiku-5-5", "usage": u(10, 5)}},
+                     {"requestId": "r1", "message": {"model": "claude-haiku-5-5", "usage": u(10, 50)}},  # streamed repeat
+                     {"requestId": "r2", "message": {"usage": u(20, 30)}}, {"type": "user"}]
+            (tr / "agent-abc.jsonl").write_text("\n".join(json.dumps(x) for x in lines))
+            usage = cost.session_usage("abc", Path(root))
+            self.assertEqual((usage["output"], usage["requests"], usage["total"]), (80, 2, 310))
+            self.assertEqual(usage["models"], ["claude-haiku-5-5"])
+            old = cost.ROOT
+            try:
+                cost.session_usage.__defaults__ = (Path(root),)
+                rec = TaskDir(author={"agent": "claude-code", "model": "haiku", "session": "abc"}).prove(
+                    FakeDevice(), by_build(proof=fails_at(4)))
+            finally:
+                cost.session_usage.__defaults__ = (old,)
+            self.assertEqual(rec["author_usage"]["total"], 310)
+            self.assertIn("haiku; 0.3k tokens", render(rec))
+            text = table([rec])
+            self.assertIn("author tokens (0k per proven test)", text)
+            self.assertIn("| haiku |", text)
+
+    def test_publish_refuses_when_review_queue_is_full(self):
+        import proofloop.report as rp
+        t = TaskDir()
+        p = t.dir / "record.json"
+        p.write_text(json.dumps(t.prove(FakeDevice(), by_build(proof=fails_at(4)))))
+        old = rp.open_proofloop_prs
+        rp.open_proofloop_prs = lambda repo: 3
+        try:
+            with tempfile.TemporaryDirectory() as repo:
+                subprocess.run(["git", "init", "-q", repo], check=True)
+                with self.assertRaisesRegex(ValueError, "3 proofloop PRs are already open"):
+                    publish(p, Path(repo), push=True)
+        finally:
+            rp.open_proofloop_prs = old
+
+
 class Artifacts(unittest.TestCase):
     def test_record_hashes_every_input(self):
         t = TaskDir()

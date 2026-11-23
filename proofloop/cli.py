@@ -41,6 +41,16 @@ def _maestro(device):
     return MaestroRunner(device.serial)
 
 
+def _extra(args) -> list:
+    """--devices A,B: more devices to spread good runs over (the main device is --device)."""
+    from .device import AdbDevice
+    out = []
+    for s in filter(None, (getattr(args, "devices", None) or "").split(",")):
+        d = AdbDevice(s.strip())
+        out.append((d, _maestro(d)))
+    return out
+
+
 def cmd_check(args) -> int:
     task = load_task(args.task)
     if args.fix:
@@ -79,7 +89,8 @@ def cmd_prove(args) -> int:
     out = Path(args.out or task.dir / "proofloop-out" / datetime.now().strftime("%Y%m%d-%H%M%S"))
     out.mkdir(parents=True, exist_ok=True)
     device = _device(args)
-    record = prove(task, device, _maestro(device), out, fail_fast=args.fail_fast)
+    record = prove(task, device, _maestro(device), out, fail_fast=args.fail_fast, extra=_extra(args),
+                   snapshot=args.snapshot, video=args.video)
     (out / "record.json").write_text(json.dumps(record, indent=2))
     (out / "report.md").write_text(render(record))
     print(render(record))
@@ -99,7 +110,7 @@ def cmd_report(args) -> int:
 
 
 def cmd_publish(args) -> int:
-    print(publish(args.record, Path(args.repo), push=args.push))
+    print(publish(args.record, Path(args.repo), push=args.push, video=args.with_video, max_open=args.max_open))
     return 0
 
 
@@ -108,7 +119,8 @@ def cmd_eval(args) -> int:
     out = Path(args.out or Path(args.dir) / "eval-out" / datetime.now().strftime("%Y%m%d-%H%M%S"))
     out.mkdir(parents=True, exist_ok=True)
     device = _device(args)
-    records = run_eval(Path(args.dir), device, _maestro(device), out, good_runs=args.runs)
+    records = run_eval(Path(args.dir), device, _maestro(device), out, good_runs=args.runs, extra=_extra(args),
+                       snapshot=args.snapshot)
     text = table(records, args.config)
     (out / "results.md").write_text(text)
     print(text)
@@ -281,6 +293,9 @@ def main(argv=None) -> int:
     s.set_defaults(fn=cmd_approve)
     s = sub.add_parser("prove"); s.add_argument("task"); s.add_argument("--out"); s.add_argument("--runs", type=int)
     s.add_argument("--fail-fast", action="store_true", help="stop good runs at the first failure")
+    s.add_argument("--devices", help="more device serials, comma-separated: good runs 2..N are spread over them")
+    s.add_argument("--snapshot", help="emulator snapshot to load on every device before the proof")
+    s.add_argument("--no-video", dest="video", action="store_false", help="do not record good run 1")
     s.add_argument("--no-learn", dest="learn", action="store_false", help="do not update the app memory"); s.set_defaults(fn=cmd_prove)
     s = sub.add_parser("try"); s.add_argument("task"); s.set_defaults(fn=cmd_try)
     s = sub.add_parser("learn"); s.add_argument("app_dir")
@@ -293,9 +308,15 @@ def main(argv=None) -> int:
     s.set_defaults(fn=cmd_learn)
     s = sub.add_parser("report"); s.add_argument("record"); s.set_defaults(fn=cmd_report)
     s = sub.add_parser("publish"); s.add_argument("record"); s.add_argument("--repo", required=True)
-    s.add_argument("--push", action="store_true", help="push and open a PR with gh"); s.set_defaults(fn=cmd_publish)
+    s.add_argument("--push", action="store_true", help="push and open a PR with gh")
+    s.add_argument("--with-video", action="store_true", help="commit the recording of good run 1 next to the flow")
+    s.add_argument("--max-open", type=int, default=3,
+                   help="with --push: refuse while this many proofloop/* PRs are open (review capacity)")
+    s.set_defaults(fn=cmd_publish)
     s = sub.add_parser("eval"); s.add_argument("dir"); s.add_argument("--out"); s.add_argument("--config", default="")
-    s.add_argument("--runs", type=int, help="override good_runs (3 for provisional dev sweeps)"); s.set_defaults(fn=cmd_eval)
+    s.add_argument("--runs", type=int, help="override good_runs (3 for provisional dev sweeps)")
+    s.add_argument("--devices", help="more device serials for good runs, comma-separated")
+    s.add_argument("--snapshot", help="emulator snapshot to load before each proof"); s.set_defaults(fn=cmd_eval)
     s = sub.add_parser("prepare"); s.add_argument("task"); s.set_defaults(fn=cmd_prepare)
     s = sub.add_parser("restore-clock"); s.set_defaults(fn=cmd_restore_clock)
     s = sub.add_parser("probe"); s.set_defaults(fn=cmd_probe)

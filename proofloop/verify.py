@@ -19,6 +19,7 @@ test can be checked against what was actually proven.
 from __future__ import annotations
 
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, time as clock_time
 from pathlib import Path
@@ -45,6 +46,7 @@ class RunResult:
     seconds: float = 0.0
     evidence: str = ""
     probes: list = field(default_factory=list)
+    device: str = ""  # serial of the device that ran it (good runs can be spread over several)
 
 
 def flake_upper_bound(passes: int, runs: int) -> float | None:
@@ -56,7 +58,7 @@ def flake_upper_bound(passes: int, runs: int) -> float | None:
 
 def run_once(task, flows, device, maestro, build: str, n: int, out_root: Path) -> RunResult:
     t0 = time.monotonic()
-    res = RunResult(build, n, passed=False)
+    res = RunResult(build, n, passed=False, device=getattr(device, "serial", ""))
     reached = False  # a checkpoint has been reached in this run
 
     def fail(checkpoint, step, error, env=False, evidence=""):
@@ -112,8 +114,15 @@ def _probe(device, spec, task) -> dict:
         time.sleep(POLL_S)
 
 
-def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dict:
-    """Run the proof and return the run record (a plain dict, ready for JSON)."""
+def prove(task, device, maestro, out_root: Path, fail_fast: bool = False, extra=(), snapshot: str | None = None,
+          video: bool = True) -> dict:
+    """Run the proof and return the run record (a plain dict, ready for JSON).
+
+    extra: more (device, maestro) pairs; good runs 2..N are spread over all devices in parallel. Bug
+    builds always run on the main device. snapshot: emulator snapshot loaded on every device first, so
+    each proof starts from the same device image (clock, do-not-disturb, free space). video: record good
+    run 1 on the main device for reviewers.
+    """
     started = datetime.now().isoformat(timespec="seconds")
     t0 = time.monotonic()
     out_root = Path(out_root)
@@ -147,6 +156,10 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
 
     record["approved_by"] = task.approved_by
     record["approved_plan"] = task.approved_plan
+    record["author"] = dict(task.author)
+    if task.author.get("session"):
+        from .cost import session_usage
+        record["author_usage"] = session_usage(task.author["session"])
     declared = {cp for f in flows.values() for cp in f.checkpoints} | set(task.probe_checkpoints())
     problem = task.approval_problem(declared)
     if problem:
@@ -156,26 +169,69 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
         return finish("blocked_policy" if policy else "needs_human", "; ".join(check.errors))
 
     over_budget = lambda: task.budget_minutes is not None and time.monotonic() - t0 > task.budget_minutes * 60
+    pool = [(device, maestro), *extra]
     try:
-        device.free_automation_lock()
+        for d, _ in pool:
+            if snapshot:
+                d.load_snapshot(snapshot)
+            d.free_automation_lock()
         record["environment"] = device.facts()
-        def good_runs(numbers):
-            """Run good-build runs. Returns a finished record, "stop" (fail-fast), or None."""
+        if snapshot:
+            record["environment"]["snapshot"] = snapshot
+        if extra:
+            record["environment"]["extra_devices"] = [d.facts() for d, _ in extra]
+
+        def run_good(d, m, numbers):
+            """Good runs on one device. Returns (runs, stop) where stop is None, "stop", or a reason."""
+            runs = []
             for n in numbers:
                 if over_budget():
-                    return finish("budget_exhausted", f"time budget of {task.budget_minutes} min ran out at good run {n}")
-                r = run_once(task, flows, device, maestro, "good", n, out_root)
-                record["good"]["runs"].append(asdict(r))
+                    return runs, ("budget_exhausted", f"time budget of {task.budget_minutes} min ran out at good run {n}")
+                r = run_once(task, flows, d, m, "good", n, out_root)
+                runs.append(asdict(r))
                 if r.environment:
-                    return finish("blocked_environment", f"good run {n}: {r.error}")
+                    return runs, ("blocked_environment", f"good run {n}: {r.error}")
                 if not r.passed and fail_fast:
-                    return "stop"
-            return None
+                    return runs, "stop"
+            return runs, None
+
+        def good_runs(numbers):
+            """Run good-build runs over the device pool. Returns a finished record, "stop" (fail-fast), or None."""
+            numbers = list(numbers)
+            shares = [(d, m, numbers[i::len(pool)]) for i, (d, m) in enumerate(pool) if numbers[i::len(pool)]]
+
+            def work(d, m, ns):
+                d.install(task.good)
+                return run_good(d, m, ns)
+            if len(shares) == 1:
+                results = [work(*shares[0])]
+            else:
+                with ThreadPoolExecutor(len(shares)) as ex:
+                    results = list(ex.map(lambda s: work(*s), shares))
+            record["good"]["runs"] += sorted((r for runs, _ in results for r in runs), key=lambda r: r["run"])
+            for _, stop in results:
+                if isinstance(stop, tuple):
+                    return finish(*stop)
+            return "stop" if any(stop == "stop" for _, stop in results) else None
 
         device.install(task.good)
-        first = good_runs([1])
-        if isinstance(first, dict):
-            return first
+        recording = video and hasattr(device, "start_recording")
+        if recording:
+            try:
+                device.start_recording()
+            except DeviceError:
+                recording = False
+        first = run_good(device, maestro, [1])
+        record["good"]["runs"] += first[0]
+        if recording:
+            try:
+                (out_root / "good-1").mkdir(parents=True, exist_ok=True)
+                record["good"]["video"] = device.stop_recording(out_root / "good-1" / "run.mp4")
+            except (DeviceError, OSError):
+                pass  # evidence only; never changes a verdict
+        if isinstance(first[1], tuple):
+            return finish(*first[1])
+        first = first[1]
 
         caught_all, missed = True, []
         for bug in [b for b in task.bugs if b.role == "proof"]:
@@ -199,7 +255,6 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
             if not caught_all and first_passed:
                 record["good"]["skipped"] = f"good runs 2-{task.good_runs} skipped: a proof bug was missed"
             elif first != "stop":
-                device.install(task.good)
                 rest = good_runs(range(2, task.good_runs + 1))
                 if isinstance(rest, dict):
                     return rest
@@ -227,8 +282,9 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
     except DeviceError as e:
         return finish("blocked_environment", str(e))
     finally:
-        try:
-            device.install(task.good)
-        except DeviceError:
-            pass
-        device.restore_clock()
+        for d, _ in pool:
+            try:
+                d.install(task.good)
+            except DeviceError:
+                pass
+            d.restore_clock()

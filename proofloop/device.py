@@ -136,6 +136,50 @@ class AdbDevice:
         self.sh("settings", "put", "global", "auto_time", "1", check=False)
         self.sh("settings", "put", "global", "auto_time_zone", "1", check=False)
 
+    def load_snapshot(self, name: str, timeout_s: float = 180) -> None:
+        """Load an emulator snapshot, then wait for the system to be ready. Emulators only."""
+        if not self.serial.startswith("emulator-"):
+            raise DeviceError(f"--snapshot needs an emulator; {self.serial} is not one")
+        r = subprocess.run([self.adb, "-s", self.serial, "emu", "avd", "snapshot", "load", name],
+                           capture_output=True, text=True, timeout=timeout_s)
+        if r.returncode != 0 or "KO" in r.stdout:
+            raise DeviceError(f"loading snapshot {name} failed: {(r.stdout + r.stderr).strip()}")
+        deadline = time.monotonic() + timeout_s
+        while True:
+            try:
+                if self.sh("getprop", "sys.boot_completed", check=False, timeout=10).strip() == "1" and \
+                        "package:" in self.sh("pm", "path", "android", check=False, timeout=10):
+                    return
+            except subprocess.TimeoutExpired:
+                pass
+            if time.monotonic() > deadline:
+                raise DeviceError(f"{self.serial} not ready {timeout_s:.0f} s after loading snapshot {name}")
+            time.sleep(1)
+
+    # --- evidence: a screen recording of one good run, for reviewers ---
+    REC = "/sdcard/proofloop-run.mp4"
+
+    def start_recording(self) -> None:
+        self.sh("rm", "-f", self.REC, check=False)
+        self._rec = subprocess.Popen([self.adb, "-s", self.serial, "shell", "screenrecord", "--time-limit", "180",
+                                      "--bit-rate", "2000000", self.REC],
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def stop_recording(self, dest) -> str | None:
+        """Stop the recording and pull it to dest. Returns the path, or None if there is no video."""
+        rec, self._rec = getattr(self, "_rec", None), None
+        if rec is None:
+            return None
+        self.sh("pkill", "-INT", "screenrecord", check=False)  # SIGINT lets screenrecord finish the mp4
+        try:
+            rec.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            rec.kill()
+        time.sleep(1)
+        r = subprocess.run([self.adb, "-s", self.serial, "pull", self.REC, str(dest)], capture_output=True, text=True)
+        self.sh("rm", "-f", self.REC, check=False)
+        return str(dest) if r.returncode == 0 and os.path.isfile(dest) and os.path.getsize(dest) > 0 else None
+
     # --- read-only probe ---
     def probe(self) -> dict:
         audio = self.sh("dumpsys", "audio", check=False)

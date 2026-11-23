@@ -65,19 +65,42 @@ def render(record: dict) -> str:
         lines += ["**Proven against** (sha256, first 12 hex):", ""]
         lines += [f"- `{Path(p).name}`: " + (f"`{h[7:19]}`" if h else "missing")
                   for p, h in record["artifacts"].items()] + [""]
+    if g.get("video"):
+        lines += [f"**Video of good run 1:** {g['video']}", ""]
     env = record.get("environment", {})
+    extra = env.get("extra_devices", [])
     lines += [f"**Duration:** {record.get('seconds', 0) / 60:.1f} min. **Failure label:** `{record.get('failure_label')}`.",
-              f"**Device:** {env.get('model', '?')}, Android {env.get('android', '?')}, host {env.get('host', '?')}.",
-              f"**Model cost:** not measured by the runner (authoring happens in the agent session).", "",
+              f"**Device:** {env.get('model', '?')}, Android {env.get('android', '?')}, host {env.get('host', '?')}"
+              + (f", plus {len(extra)} more for good runs" if extra else "")
+              + (f", from snapshot `{env['snapshot']}`" if env.get("snapshot") else "") + ".",
+              f"**Approved by:** {record.get('approved_by') or 'nobody'}.",
+              f"**Authored by:** {author_line(record)}.", "",
               "Humans merge. ProofLoop never merges its own pull requests."]
     return "\n".join(lines) + "\n"
 
 
-def publish(record_path, repo: Path, push: bool = False) -> str:
+def author_line(record: dict) -> str:
+    a, u = record.get("author") or {}, record.get("author_usage")
+    who = ", ".join(str(a[k]) for k in ("agent", "model") if a.get(k)) or "not recorded"
+    if u:
+        return f"{who}; {u['total'] / 1000:.1f}k tokens ({u['output'] / 1000:.1f}k output, {u['requests']} requests)"
+    if a.get("tokens"):
+        return f"{who}; {int(a['tokens']) / 1000:.1f}k tokens (reported)"
+    return who + "; model cost not measured (no author session in task.json)"
+
+
+def open_proofloop_prs(repo: Path) -> int:
+    out = subprocess.run(["gh", "pr", "list", "--state", "open", "--json", "headRefName", "--limit", "200"],
+                         cwd=repo, check=True, capture_output=True, text=True).stdout
+    return sum(p["headRefName"].startswith("proofloop/") for p in json.loads(out))
+
+
+def publish(record_path, repo: Path, push: bool = False, video: bool = False, max_open: int = 3) -> str:
     """Copy the proven flows into the app repo on a new branch and commit them.
 
-    With push=True, also push the branch and open a pull request with gh. Refuses any
-    record that is not proven: an unproven test never opens a normal pull request.
+    With push=True, also push the branch and open a pull request with gh, unless max_open proofloop
+    PRs are already waiting: reviews, not generation, are the scarce resource. Refuses any record that
+    is not proven: an unproven test never opens a normal pull request.
     """
     record = load_record(record_path)
     if record["verdict"] != "proven":
@@ -96,10 +119,18 @@ def publish(record_path, repo: Path, push: bool = False) -> str:
     git = lambda *a: subprocess.run(["git", "-C", str(repo), *a], check=True, capture_output=True, text=True).stdout
     if git("status", "--porcelain", "--", ".maestro"):
         raise ValueError(".maestro has uncommitted changes; commit or stash them first")
+    if push and max_open and (n := open_proofloop_prs(repo)) >= max_open:
+        raise ValueError(f"refusing to open another PR: {n} proofloop PRs are already open (max {max_open}); "
+                         "get those reviewed first or raise --max-open")
     git("switch", "-c", branch)
     dest.mkdir(parents=True, exist_ok=True)
     for f in record["flows"]:
         shutil.copy(f, dest / Path(f).name)
+    vid = record["good"].get("video")
+    if video:
+        if not vid or not Path(vid).is_file():
+            raise ValueError("--with-video: the record has no recording of good run 1")
+        shutil.copy(vid, dest / "good-run.mp4")
     (dest / "proofloop-report.md").write_text(render(record))
     git("add", str(dest))
     git("commit", "-m", f"Add proven UI test: {record['task']}\n\n{record['criterion']}\n\n{record['reason']}")
