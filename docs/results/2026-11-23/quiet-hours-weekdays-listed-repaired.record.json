@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "proofloop_version": "0.1.0",
+  "task": "quiet-hours/weekdays-listed",
+  "criterion": "Creating a Weekdays schedule and activating it shows it on Home with its title, 'Weekdays', and the correct next start.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/flow.yaml"
+  ],
+  "started": "2026-11-23T12:44:28",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [
+    {
+      "reason": "cold start sometimes showed a blank screen",
+      "change": "wait up to 20 s for the first screen"
+    },
+    {
+      "reason": "launch right after clearing data was killed by the pending task removal",
+      "change": "clean state moved out of the flow into the runner's reset, which waits for the old task to go"
+    },
+    {
+      "reason": "re-proved on main b41de64 (2026-11-23): 0/10 good runs; one-time tip bubbles from PR #76 dim Home and the wizard, so 'Manage your sound profiles' and 'Step 1/2 of 2' were not visible",
+      "change": "optional taps on \"Skip|Got it\" before the waits the bubbles block (no runFlow: the app repo's own fix used runFlow when:, which the allowlist blocks); no checkpoint or assertion changed"
+    }
+  ],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 77.9,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 79.0,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 78.3,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 4,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 79.1,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 5,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 78.9,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 6,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 80.9,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 7,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 78.3,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 8,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 85.2,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 9,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 86.6,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 10,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 77.1,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    ],
+    "required": 10,
+    "video": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-weekdays-listed/good-1/run.mp4",
+    "passes": 10,
+    "flake_upper_bound_95": 0.2588655508930523
+  },
+  "bugs": [
+    {
+      "name": "weekdays-off-by-one",
+      "role": "proof",
+      "expect": "C3",
+      "caught": true,
+      "result": {
+        "build": "weekdays-off-by-one",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "C3",
+        "step": "flow.yaml:74 assertVisible",
+        "error": "Assertion is false: \"Weekdays\" is visible",
+        "environment": false,
+        "seconds": 83.6,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-weekdays-listed/weekdays-off-by-one-1/step1-flow/2026-11-23_124551/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "next-skips-today",
+      "role": "held_out",
+      "expect": null,
+      "caught": true,
+      "result": {
+        "build": "next-skips-today",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "C4",
+        "step": "flow.yaml:76 assertVisible",
+        "error": "Assertion is false: \"Next: Today 9:00 AM\" is visible",
+        "environment": false,
+        "seconds": 84.7,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-weekdays-listed/next-skips-today-1/step1-flow/2026-11-23_125357/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5560",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64",
+    "extra_devices": [
+      {
+        "serial": "emulator-5562",
+        "model": "sdk_gphone64_arm64",
+        "android": "14",
+        "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+        "host": "Darwin arm64"
+      }
+    ]
+  },
+  "artifacts": {
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/task.json": "sha256:a1660f61bb733e23925850ab8c73bcb40e70993b690f15f4c8cb6898f8ccf1cb",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/plan.md": "sha256:c84772d0aa9c95a51e5bac83f3e690bcc4e72b2088098a82047eda30029c930e",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/flow.yaml": "sha256:c8f1cfd38665c2ba3178ce15689ef8fc99c9e35731d073a77c52f3d6afb57062",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk": "sha256:ae2d097aaa55dbcb1d56199ef6d4523212a3d22169d870682995c3152c749ab1",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-weekdays-off-by-one-b41de64.apk": "sha256:99680a698056c493dd51132cb72051d671adc1a51ed34b785911640a97cd0f23",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-next-skips-today-b41de64.apk": "sha256:9353b794d542012f3958d0bcb79b668b506d041f5015559e24caaf350f9fd1bf"
+  },
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; plan.md unchanged since Samir's own approval), 2026-11-23",
+  "approved_plan": "sha256:c84772d0aa9c95a51e5bac83f3e690bcc4e72b2088098a82047eda30029c930e",
+  "author": {},
+  "verdict": "proven",
+  "reason": "passed 10/10; every proof bug failed at its expected checkpoint",
+  "seconds": 652.4,
+  "failure_label": "none"
+}

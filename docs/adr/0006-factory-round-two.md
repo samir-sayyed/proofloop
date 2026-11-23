@@ -51,10 +51,19 @@ unmeasured. This round closes those gaps and checks each change against real run
   proven, about 21 s each. Haiku with the device was 3/3 proven, about 3 min each. See
   `experiments/map-effect`, round 3.
 
+- `from-fix` on that real fix (`2123448`) scaffolded a task with the fix as good build and `good-bcef12f.apk` as
+  proof bug, and the commit's explanation in `plan.md`. Writing its flow needs a VIP call on the emulator. Not
+  done: it is the next task, because it targets the one real bug no test catches.
+- `next` ran on both apps' maps: 20 untested items for Quiet Hours, 5 for Sunflower, rules first. No item was
+  authored from it yet.
+
 ## Consequences
 
-- Tasks now point at the app's current build and carry two repairs each. Their history starts on 2026-11-23,
-  because earlier proofs predate the history file.
+- Tasks now point at the app's current build and carry their tip-bubble repairs. Each history was backfilled
+  with its first proof from `docs/results/` (no flow hash then, so `flows: pre-history`), so
+  `proofloop history` reports the shelf life: proven 6 to 8 days, broke on the first build with tip bubbles,
+  proven again after the repair. Today's records are kept in `docs/results/2026-11-23/` and
+  `experiments/map-effect/round3/`.
 - Video files and evidence stay out of git. Only `publish --with-video` copies one next to a flow.
 - `--snapshot` and `-read-only` multi-instance emulators do not mix. Use a writable emulator for snapshot
   resets, or read-only copies booted from the snapshot for parallel runs.

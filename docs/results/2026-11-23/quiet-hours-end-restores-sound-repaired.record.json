@@ -1,0 +1,621 @@
+{
+  "schema_version": 2,
+  "proofloop_version": "0.1.0",
+  "task": "quiet-hours/end-restores-sound",
+  "criterion": "A Silent schedule restores normal sound at its end time, and Home shows it active during the window and the next start after it.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/setup.yaml",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/active.yaml",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/ended.yaml"
+  ],
+  "started": "2026-11-23T12:14:21",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [
+    {
+      "reason": "status flows force-stopped the app and cancelled its END alarm",
+      "change": "launchApp stopApp: false; force-stop blocked by the flow checker"
+    },
+    {
+      "reason": "re-proved on main b41de64 (2026-11-23): 0/10 good runs; one-time tip bubbles from PR #76 dim Home and the wizard, so 'Manage your sound profiles' and 'Step 1/2 of 2' were not visible",
+      "change": "optional taps on \"Skip|Got it\" before the waits the bubbles block (no runFlow: the app repo's own fix used runFlow when:, which the allowlist blocks); no checkpoint or assertion changed"
+    }
+  ],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 134.6,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 136.9,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 139.7,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "null",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "5",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 4,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 138.3,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 5,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 138.8,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 6,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 142.8,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 7,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 142.7,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 8,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 142.3,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:01",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 9,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 141.6,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 10,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 133.5,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    ],
+    "required": 10,
+    "video": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-end-restores-sound/good-1/run.mp4",
+    "passes": 10,
+    "flake_upper_bound_95": 0.2588655508930523
+  },
+  "bugs": [
+    {
+      "name": "end-hour-late",
+      "role": "proof",
+      "expect": "E2",
+      "caught": true,
+      "result": {
+        "build": "end-hour-late",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E2",
+        "step": "probe E2",
+        "error": "expected normal, read {'time': '17:01:01', 'ringer': 'NORMAL', 'zen': '1', 'ring': '4', 'state': 'quiet'}",
+        "environment": false,
+        "seconds": 187.4,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:01:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "pre-fix-72587d5",
+      "role": "proof",
+      "expect": "E1s",
+      "caught": true,
+      "result": {
+        "build": "pre-fix-72587d5",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E1s",
+        "step": "active.yaml:6 extendedWaitUntil",
+        "error": "Assertion is false: \"Active until 5:00 PM\" is visible",
+        "environment": false,
+        "seconds": 102.7,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-end-restores-sound/pre-fix-72587d5-1/step7-active/2026-11-23_122111/active",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "end-5min-early",
+      "role": "held_out",
+      "expect": null,
+      "caught": true,
+      "result": {
+        "build": "end-5min-early",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E2",
+        "step": "probe E2",
+        "error": "expected normal, read {'time': '17:01:00', 'ringer': 'NORMAL', 'zen': '1', 'ring': '4', 'state': 'quiet'}",
+        "environment": false,
+        "seconds": 187.1,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:01:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "pre-fix-bcef12f",
+      "role": "held_out",
+      "expect": null,
+      "caught": false,
+      "result": {
+        "build": "pre-fix-bcef12f",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 117.0,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "4",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "4",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5560",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64",
+    "extra_devices": [
+      {
+        "serial": "emulator-5562",
+        "model": "sdk_gphone64_arm64",
+        "android": "14",
+        "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+        "host": "Darwin arm64"
+      }
+    ]
+  },
+  "artifacts": {
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/task.json": "sha256:d72a03fd5c5258ba08c47af0e1953a682d60330ac144faba93823339e1156692",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/plan.md": "sha256:4102b105dc335e83ec97bc9b04f41594c621625712cca873e207774bee9d7ec1",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/setup.yaml": "sha256:57e885665f79b195f7d57fd67eadb47006c86e56d90f15dfa8196a76b0542f2d",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/active.yaml": "sha256:87a779582c662173d60cc01ca1ef55bc76c7d67bb507f72c6a1e06cf6c8e651f",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/ended.yaml": "sha256:ab0dbe9e325b1b958f6cd6753e77edadab620a4c090b090924fbab1b2a189b04",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk": "sha256:ae2d097aaa55dbcb1d56199ef6d4523212a3d22169d870682995c3152c749ab1",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-end-hour-late-b41de64.apk": "sha256:3d154e2833de5634239b6cf108c30f148546a935b14ed7a4d97499ca2418375d",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-5.3.2.apk": "sha256:bc947e2b022feacfa74ab663d199ae86f5622902a9971ca5b4bf31fadf86cca2",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-end-5min-early-b41de64.apk": "sha256:582f9c2041b450b8563ee0f63e0fd6b0e01eb5807188274dcb10bf814833bd75",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-bcef12f.apk": "sha256:6c869878f20b373fa476201ffe73ef998657a045b130cba8e1e14cac40aa836a"
+  },
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; dropped pre-fix-3cdc546: it predates the good build, see mine-bugs --after), 2026-11-23",
+  "approved_plan": "sha256:4102b105dc335e83ec97bc9b04f41594c621625712cca873e207774bee9d7ec1",
+  "author": {},
+  "verdict": "proven",
+  "reason": "passed 10/10; every proof bug failed at its expected checkpoint",
+  "seconds": 1427.7,
+  "failure_label": "none"
+}

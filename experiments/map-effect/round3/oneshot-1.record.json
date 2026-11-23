@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "proofloop_version": "0.1.0",
+  "task": "map-effect/oneshot-1",
+  "criterion": "Adding two different plants to the garden lists both of them on the My garden tab.",
+  "task_file": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/trials/oneshot-1/score/task.json",
+  "flows": [
+    "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/trials/oneshot-1/score/flow.yaml"
+  ],
+  "started": "2026-11-23T11:34:54",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/sunflower-good.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 36.5,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5556"
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 35.1,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5556"
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 35.2,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5556"
+      }
+    ],
+    "required": 3,
+    "video": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/trials/oneshot-1/score/out/good-1/run.mp4",
+    "passes": 3,
+    "flake_upper_bound_95": 0.6315968501359612
+  },
+  "bugs": [
+    {
+      "name": "garden-wrong-column",
+      "role": "proof",
+      "expect": "C1",
+      "caught": true,
+      "result": {
+        "build": "garden-wrong-column",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "C1",
+        "step": "flow.yaml:26 assertVisible",
+        "error": "Assertion is false: \"Avocado\" is visible",
+        "environment": false,
+        "seconds": 42.0,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/trials/oneshot-1/score/out/garden-wrong-column-1/step1-flow/2026-11-23_113536/flow",
+        "probes": [],
+        "device": "emulator-5556"
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5556",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64"
+  },
+  "artifacts": {
+    "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/trials/oneshot-1/score/task.json": "sha256:75d1c754e8e10685403b59012c8d5d774361bb6e675bb24aef6b0d96c3b28e41",
+    "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/trials/oneshot-1/score/plan.md": "sha256:ff145fa892bec666d472683670c530ca4ae1218e946f2aa8bf553d9c245191d6",
+    "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/trials/oneshot-1/score/flow.yaml": "sha256:e957107951ef6061804488b9329992036c9aa8e4cf35a912acc3891e8ea19d14",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/sunflower-good.apk": "sha256:24384bf455ac42d0943a502887efe33d9525793cde09fb6e9338c7838ca72438",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/sunflower-bug-garden-wrong-column.apk": "sha256:c011c72b665ff03815d381a29e0023ebab22ceefdbd55cd3ebfe545a7c9813ee"
+  },
+  "approved_by": "standing approval, experiments/map-effect brief: the proof bug must fail at C1; plan from author markers, 2026-11-23",
+  "approved_plan": "sha256:ff145fa892bec666d472683670c530ca4ae1218e946f2aa8bf553d9c245191d6",
+  "author": {},
+  "verdict": "proven",
+  "reason": "passed 3/3; every proof bug failed at its expected checkpoint",
+  "seconds": 152.5,
+  "failure_label": "none"
+}

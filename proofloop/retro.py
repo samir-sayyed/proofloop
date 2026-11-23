@@ -88,5 +88,6 @@ def retro(paths) -> str:
         for f, r in items[:3]:
             step = next((b["result"]["step"] for b in r.get("bugs", []) if b["role"] == "proof" and not b["caught"]), "") \
                 or next((x["step"] for x in r["good"]["runs"] if not x["passed"]), "")
-            lines.append(f"    {r['task']}: {re.sub(r'\s+', ' ', r.get('reason', ''))[:110]} [{step}] ({f})")
+            reason = re.sub(r"\s+", " ", r.get("reason", ""))[:110]  # outside the f-string: Python 3.11
+            lines.append(f"    {r['task']}: {reason} [{step}] ({f})")
     return "\n".join(lines) + "\n"

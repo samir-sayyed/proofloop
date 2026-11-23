@@ -48,7 +48,8 @@ What the work showed:
 - **Fresh agents write tests that look right but hide bugs.** In 6 of 6 trials the author put a wait above the
   checkpoint marker, so the seeded bug failed at setup and was not counted. The flow checker now rejects it.
 
-Details and limits: [docs/results.md](docs/results.md).
+Details and limits: [docs/results.md](docs/results.md) (the November 14-18 proofs on `e4ba3eb`); the
+2026-11-23 records (break, repair, re-proof, timing, snapshot) are in [docs/results/2026-11-23/](docs/results/2026-11-23/).
 
 ### Keeping tests proven
 

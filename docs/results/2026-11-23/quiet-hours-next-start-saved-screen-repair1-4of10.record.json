@@ -1,0 +1,211 @@
+{
+  "schema_version": 2,
+  "proofloop_version": "0.1.0",
+  "task": "quiet-hours/next-start-saved-screen",
+  "criterion": "After a Weekdays schedule is activated on a Wednesday morning, the Routine saved screen states the next start as today at 9:00 AM.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/next-start-saved-screen/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/next-start-saved-screen/flow.yaml"
+  ],
+  "started": "2026-11-23T12:38:11",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [
+    {
+      "reason": "re-proved on main b41de64 (2026-11-23): 0/10 good runs; one-time tip bubbles from PR #76 dim Home and the wizard, so 'Manage your sound profiles' and 'Step 1/2 of 2' were not visible",
+      "change": "optional taps on \"Skip|Got it\" before the waits the bubbles block (no runFlow: the app repo's own fix used runFlow when:, which the allowlist blocks); no checkpoint or assertion changed"
+    }
+  ],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:31 extendedWaitUntil",
+        "error": "Assertion is false: \"Schedule Details\" is visible",
+        "environment": false,
+        "seconds": 41.9,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/good-1/step1-flow/2026-11-23_123815/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 65.2,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 66.8,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 4,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 70.9,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 5,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:31 extendedWaitUntil",
+        "error": "Assertion is false: \"Schedule Details\" is visible",
+        "environment": false,
+        "seconds": 46.5,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/good-5/step1-flow/2026-11-23_124046/flow",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 6,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:31 extendedWaitUntil",
+        "error": "Assertion is false: \"Schedule Details\" is visible",
+        "environment": false,
+        "seconds": 44.4,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/good-6/step1-flow/2026-11-23_124155/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 7,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:31 extendedWaitUntil",
+        "error": "Assertion is false: \"Schedule Details\" is visible",
+        "environment": false,
+        "seconds": 47.6,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/good-7/step1-flow/2026-11-23_124133/flow",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 8,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 68.9,
+        "evidence": "",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 9,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:31 extendedWaitUntil",
+        "error": "Assertion is false: \"Schedule Details\" is visible",
+        "environment": false,
+        "seconds": 47.0,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/good-9/step1-flow/2026-11-23_124219/flow",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 10,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:31 extendedWaitUntil",
+        "error": "Assertion is false: \"Schedule Details\" is visible",
+        "environment": false,
+        "seconds": 41.1,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/good-10/step1-flow/2026-11-23_124347/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    ],
+    "required": 10,
+    "video": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/good-1/run.mp4",
+    "passes": 4,
+    "flake_upper_bound_95": null
+  },
+  "bugs": [
+    {
+      "name": "next-skips-today",
+      "role": "proof",
+      "expect": "A2",
+      "caught": false,
+      "result": {
+        "build": "next-skips-today",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:31 extendedWaitUntil",
+        "error": "Assertion is false: \"Schedule Details\" is visible",
+        "environment": false,
+        "seconds": 38.7,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove2/quiet-hours-next-start-saved-screen/next-skips-today-1/step1-flow/2026-11-23_123858/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5560",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64",
+    "extra_devices": [
+      {
+        "serial": "emulator-5562",
+        "model": "sdk_gphone64_arm64",
+        "android": "14",
+        "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+        "host": "Darwin arm64"
+      }
+    ]
+  },
+  "artifacts": {
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/next-start-saved-screen/task.json": "sha256:817b3428d8fb4d07fb2191ebd31f962e2e4e369516be5bc29d2a7436c31ae697",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/next-start-saved-screen/plan.md": "sha256:077f36fa71e68a2e2f829bb59985569878443235c038ae79f9c2ced6618a7f1a",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/next-start-saved-screen/flow.yaml": "sha256:ef043983bd6e2b42791fb9f3b45e58a4479426a2ac05f0d441b2afe247867672",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk": "sha256:ae2d097aaa55dbcb1d56199ef6d4523212a3d22169d870682995c3152c749ab1",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-next-skips-today-b41de64.apk": "sha256:9353b794d542012f3958d0bcb79b668b506d041f5015559e24caaf350f9fd1bf"
+  },
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; plan.md unchanged since Samir's own approval), 2026-11-23",
+  "approved_plan": "sha256:077f36fa71e68a2e2f829bb59985569878443235c038ae79f9c2ced6618a7f1a",
+  "author": {},
+  "verdict": "rejected_flaky",
+  "reason": "good build passed 4/10",
+  "seconds": 374.7,
+  "failure_label": "flaky"
+}

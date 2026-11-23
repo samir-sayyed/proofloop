@@ -1,0 +1,45 @@
+appId: com.google.samples.apps.sunflower
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "My garden"
+    timeout: 15000
+- tapOn: "Plant list"
+- extendedWaitUntil:
+    visible: "Avocado"
+    timeout: 20000
+- tapOn: "Avocado"
+- extendedWaitUntil:
+    visible: "Add plant"
+    timeout: 10000
+- tapOn: "Add plant"
+- extendedWaitUntil:
+    visible: "Navigate up"
+    timeout: 10000
+- tapOn: "Navigate up"
+- extendedWaitUntil:
+    visible: "Plant list"
+    timeout: 10000
+- tapOn: "My garden"
+# checkpoint: C1 the first plant is listed
+- assertVisible: "Avocado"
+- tapOn: "Plant list"
+- extendedWaitUntil:
+    visible: "Apple"
+    timeout: 20000
+- tapOn: "Apple"
+- extendedWaitUntil:
+    visible: "Add plant"
+    timeout: 10000
+- tapOn: "Add plant"
+- extendedWaitUntil:
+    visible: "Navigate up"
+    timeout: 10000
+- tapOn: "Navigate up"
+- extendedWaitUntil:
+    visible: "Plant list"
+    timeout: 10000
+- tapOn: "My garden"
+# checkpoint: C2 the second plant is also listed
+- assertVisible: "Apple"

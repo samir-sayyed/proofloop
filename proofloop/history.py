@@ -54,6 +54,10 @@ def summary(rows: list[dict]) -> str:
             f"proven on {len(builds)} good build(s)")
     if broke:
         text += f"; stopped being proven on {broke['date'][:10]} (build {broke['good']}: {broke['verdict']}) after {days} days"
+        again = next((r for r in rows if r["date"] > broke["date"] and r["verdict"] == "proven"), None)
+        if again:
+            text += (f"; proven again on {again['date'][:10]} (build {again['good']}"
+                     + (", flows changed" if again["flows"] != broke["flows"] else "") + ")")
     else:
         last = rows[-1]
         text += f"; latest {last['date'][:10]}: {last['verdict']}; shelf life so far {days} days"

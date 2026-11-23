@@ -1,0 +1,235 @@
+{
+  "schema_version": 2,
+  "proofloop_version": "0.1.0",
+  "task": "quiet-hours/weekdays-listed",
+  "criterion": "Creating a Weekdays schedule and activating it shows it on Home with its title, 'Weekdays', and the correct next start.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/flow.yaml"
+  ],
+  "started": "2026-11-23T11:53:41",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [
+    {
+      "reason": "cold start sometimes showed a blank screen",
+      "change": "wait up to 20 s for the first screen"
+    },
+    {
+      "reason": "launch right after clearing data was killed by the pending task removal",
+      "change": "clean state moved out of the flow into the runner's reset, which waits for the old task to go"
+    }
+  ],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 46.0,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-1/step1-flow/2026-11-23_115355/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 63.5,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-2/step1-flow/2026-11-23_115532/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 65.5,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-3/step1-flow/2026-11-23_115539/flow",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 4,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 63.5,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-4/step1-flow/2026-11-23_115638/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 5,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 69.2,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-5/step1-flow/2026-11-23_115647/flow",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 6,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 65.7,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-6/step1-flow/2026-11-23_115741/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 7,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 62.6,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-7/step1-flow/2026-11-23_115755/flow",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 8,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 66.0,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-8/step1-flow/2026-11-23_115846/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 9,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 70.6,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-9/step1-flow/2026-11-23_115859/flow",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 10,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 52.9,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-10/step1-flow/2026-11-23_115953/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    ],
+    "required": 10,
+    "video": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/good-1/run.mp4",
+    "passes": 0,
+    "flake_upper_bound_95": null
+  },
+  "bugs": [
+    {
+      "name": "weekdays-off-by-one",
+      "role": "proof",
+      "expect": "C3",
+      "caught": false,
+      "result": {
+        "build": "weekdays-off-by-one",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 41.3,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/weekdays-off-by-one-1/step1-flow/2026-11-23_115446/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "next-skips-today",
+      "role": "held_out",
+      "expect": null,
+      "caught": false,
+      "result": {
+        "build": "next-skips-today",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "flow.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 44.3,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-weekdays-listed/next-skips-today-1/step1-flow/2026-11-23_120048/flow",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5560",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64",
+    "extra_devices": [
+      {
+        "serial": "emulator-5562",
+        "model": "sdk_gphone64_arm64",
+        "android": "14",
+        "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+        "host": "Darwin arm64"
+      }
+    ]
+  },
+  "artifacts": {
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/task.json": "sha256:c6e342c8c254796a1c6f5cf98534a159416c1e765f3f29554d634725cd82e41c",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/plan.md": "sha256:c84772d0aa9c95a51e5bac83f3e690bcc4e72b2088098a82047eda30029c930e",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/weekdays-listed/flow.yaml": "sha256:215d856d6094aa50035555aef45aeb086bc04ff62b694b3a4ed34bd8aede9af4",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk": "sha256:ae2d097aaa55dbcb1d56199ef6d4523212a3d22169d870682995c3152c749ab1",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-weekdays-off-by-one-b41de64.apk": "sha256:99680a698056c493dd51132cb72051d671adc1a51ed34b785911640a97cd0f23",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-next-skips-today-b41de64.apk": "sha256:9353b794d542012f3958d0bcb79b668b506d041f5015559e24caaf350f9fd1bf"
+  },
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; plan.md unchanged since Samir's own approval), 2026-11-23",
+  "approved_plan": "sha256:c84772d0aa9c95a51e5bac83f3e690bcc4e72b2088098a82047eda30029c930e",
+  "author": {},
+  "verdict": "rejected_flaky",
+  "reason": "good build passed 0/10",
+  "seconds": 466.3,
+  "failure_label": "flaky"
+}

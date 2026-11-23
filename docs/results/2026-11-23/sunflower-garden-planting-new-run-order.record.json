@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "proofloop_version": "0.1.0",
+  "task": "sunflower/garden-planting",
+  "criterion": "Adding a plant to the garden lists it on the My garden tab with today's planting date.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/sunflower/garden-planting/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/sunflower/garden-planting/flow.yaml"
+  ],
+  "started": "2026-11-23T10:43:19",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [
+    {
+      "reason": "a proof bug failed at setup, not C2: the first wait expected 'Your garden is empty', which a garden bug can change",
+      "change": "wait for the 'Plant list' tab, present in every state; no checkpoint changed"
+    }
+  ],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/sunflower-good.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 19.3,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 17.3,
+        "evidence": "",
+        "probes": []
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 17.1,
+        "evidence": "",
+        "probes": []
+      }
+    ],
+    "required": 3,
+    "passes": 3,
+    "flake_upper_bound_95": 0.6315968501359612
+  },
+  "bugs": [
+    {
+      "name": "garden-wrong-column",
+      "role": "proof",
+      "expect": "C2",
+      "caught": true,
+      "result": {
+        "build": "garden-wrong-column",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "C2",
+        "step": "flow.yaml:23 extendedWaitUntil",
+        "error": "Assertion is false: \"Planted\" is visible",
+        "environment": false,
+        "seconds": 28.7,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/sunflower-proof/garden-wrong-column-1/step1-flow/2026-11-23_104340/flow",
+        "probes": []
+      }
+    },
+    {
+      "name": "date-day-of-year",
+      "role": "held_out",
+      "expect": null,
+      "caught": true,
+      "result": {
+        "build": "date-day-of-year",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "C3",
+        "step": "flow.yaml:28 assertVisible",
+        "error": "Assertion is false: \"Nov 18, 2026\" is visible",
+        "environment": false,
+        "seconds": 33.8,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/sunflower-proof/date-day-of-year-1/step1-flow/2026-11-23_104444/flow",
+        "probes": []
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5556",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64"
+  },
+  "artifacts": {
+    "/Users/samirsayyed/Desktop/proofloop/tasks/sunflower/garden-planting/task.json": "sha256:0dd2b9666079bf058aa0624aa0046b1978f0bcaad85245b871d812cd6e8b547a",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/sunflower/garden-planting/plan.md": "sha256:035786307f586d852b4265a9e973981187d1862c31a0a0f35d8ecb897e94ea1f",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/sunflower/garden-planting/flow.yaml": "sha256:aea928274debd57159f8abbf6b1cacba67cab1182ebe52f31bcd3706d135ffec",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/sunflower-good.apk": "sha256:24384bf455ac42d0943a502887efe33d9525793cde09fb6e9338c7838ca72438",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/sunflower-bug-garden-wrong-column.apk": "sha256:c011c72b665ff03815d381a29e0023ebab22ceefdbd55cd3ebfe545a7c9813ee",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/sunflower-bug-date-day-of-year.apk": "sha256:891cf6f6a41436ae8944788d0752d076f89bae1a1778ef484345530903f62347"
+  },
+  "approved_by": "Samir, 2026-11-23",
+  "approved_plan": "sha256:035786307f586d852b4265a9e973981187d1862c31a0a0f35d8ecb897e94ea1f",
+  "verdict": "proven",
+  "reason": "passed 3/3; every proof bug failed at its expected checkpoint",
+  "seconds": 117.6,
+  "failure_label": "none"
+}

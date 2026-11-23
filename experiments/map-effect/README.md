@@ -105,6 +105,11 @@ re-counted every turn) were about 370k per one-shot trial and 700-900k per Haiku
   an anchor wait cannot hide a bug, shared or not. A stricter rule that refused shared anchors was tried and
   reverted (it added checker rounds, not catches).
 
+**Confound: the checker changed between arms.** `check.sh` calls the repo's checker live. The one-shot trials
+ran with shared anchors exempting waits. All three Haiku trials ran under a stricter rule that refused waits
+on shared anchors, which was reverted afterwards. So the Haiku arm's extra checker rounds are partly the
+stricter checker, not only the model. Records and flows: [round3/](round3/).
+
 What this does not show: one criterion on one small app whose map was written after a flow for it existed,
 three trials per arm. A one-shot author on an unmapped screen has nothing to go on. The cheaper-model result
 is for a short, well-mapped flow.

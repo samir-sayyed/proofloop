@@ -1,0 +1,354 @@
+{
+  "schema_version": 2,
+  "proofloop_version": "0.1.0",
+  "task": "quiet-hours/end-restores-sound",
+  "criterion": "A Silent schedule restores normal sound at its end time, and Home shows it active during the window and the next start after it.",
+  "task_file": "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/task.json",
+  "flows": [
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/setup.yaml",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/active.yaml",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/ended.yaml"
+  ],
+  "started": "2026-11-23T11:34:54",
+  "flow_check": {
+    "errors": [],
+    "coordinate_fallbacks": []
+  },
+  "repairs": [
+    {
+      "reason": "status flows force-stopped the app and cancelled its END alarm",
+      "change": "launchApp stopApp: false; force-stop blocked by the flow checker"
+    }
+  ],
+  "good": {
+    "apk": "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk",
+    "runs": [
+      {
+        "build": "good",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 35.5,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-1/step1-setup/2026-11-23_113500/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 2,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 47.4,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-2/step1-setup/2026-11-23_113736/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 3,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 54.6,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-3/step1-setup/2026-11-23_113741/setup",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 4,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 55.9,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-4/step1-setup/2026-11-23_113826/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 5,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 51.5,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-5/step1-setup/2026-11-23_113837/setup",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 6,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 57.7,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-6/step1-setup/2026-11-23_113922/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 7,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 58.4,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-7/step1-setup/2026-11-23_113929/setup",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 8,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 49.4,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-8/step1-setup/2026-11-23_114019/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      },
+      {
+        "build": "good",
+        "run": 9,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 48.8,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-9/step1-setup/2026-11-23_114026/setup",
+        "probes": [],
+        "device": "emulator-5562"
+      },
+      {
+        "build": "good",
+        "run": 10,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 38.7,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-10/step1-setup/2026-11-23_114108/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    ],
+    "required": 10,
+    "video": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/good-1/run.mp4",
+    "passes": 0,
+    "flake_upper_bound_95": null
+  },
+  "bugs": [
+    {
+      "name": "end-hour-late",
+      "role": "proof",
+      "expect": "E2",
+      "caught": false,
+      "result": {
+        "build": "end-hour-late",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 29.4,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/end-hour-late-1/step1-setup/2026-11-23_113538/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "pre-fix-72587d5",
+      "role": "proof",
+      "expect": "E1s",
+      "caught": true,
+      "result": {
+        "build": "pre-fix-72587d5",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E1s",
+        "step": "active.yaml:6 extendedWaitUntil",
+        "error": "Assertion is false: \"Active until 5:00 PM\" is visible",
+        "environment": false,
+        "seconds": 83.8,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/pre-fix-72587d5-1/step7-active/2026-11-23_113708/active",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "null",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "null",
+            "state": "quiet"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "end-5min-early",
+      "role": "held_out",
+      "expect": null,
+      "caught": false,
+      "result": {
+        "build": "end-5min-early",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "setup",
+        "step": "setup.yaml:13 extendedWaitUntil",
+        "error": "Assertion is false: \"Manage your sound profiles\" is visible",
+        "environment": false,
+        "seconds": 33.4,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/end-5min-early-1/step1-setup/2026-11-23_114147/setup",
+        "probes": [],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "pre-fix-3cdc546",
+      "role": "held_out",
+      "expect": null,
+      "caught": true,
+      "result": {
+        "build": "pre-fix-3cdc546",
+        "run": 1,
+        "passed": false,
+        "checkpoint": "E1s",
+        "step": "active.yaml:6 extendedWaitUntil",
+        "error": "Assertion is false: \"Active until 5:00 PM\" is visible",
+        "environment": false,
+        "seconds": 83.6,
+        "evidence": "/private/tmp/claude-501/-Users-samirsayyed--claude-spares-spare-wNcq8r/1e660a57-bb79-43b2-bb6d-a441a248d1c9/scratchpad/qh-reprove/quiet-hours-end-restores-sound/pre-fix-3cdc546-1/step7-active/2026-11-23_114322/active",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:00",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "null",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "null",
+            "state": "quiet"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    },
+    {
+      "name": "pre-fix-bcef12f",
+      "role": "held_out",
+      "expect": null,
+      "caught": false,
+      "result": {
+        "build": "pre-fix-bcef12f",
+        "run": 1,
+        "passed": true,
+        "checkpoint": null,
+        "step": "",
+        "error": "",
+        "environment": false,
+        "seconds": 103.8,
+        "evidence": "",
+        "probes": [
+          {
+            "checkpoint": "S",
+            "time": "09:00:01",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "null",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E1",
+            "time": "16:59:30",
+            "ringer": "NORMAL",
+            "zen": "1",
+            "ring": "null",
+            "state": "quiet"
+          },
+          {
+            "checkpoint": "E2",
+            "time": "17:00:00",
+            "ringer": "NORMAL",
+            "zen": "0",
+            "ring": "null",
+            "state": "normal"
+          }
+        ],
+        "device": "emulator-5560"
+      }
+    }
+  ],
+  "environment": {
+    "serial": "emulator-5560",
+    "model": "sdk_gphone64_arm64",
+    "android": "14",
+    "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+    "host": "Darwin arm64",
+    "extra_devices": [
+      {
+        "serial": "emulator-5562",
+        "model": "sdk_gphone64_arm64",
+        "android": "14",
+        "image": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A4/12096271:user/release-keys",
+        "host": "Darwin arm64"
+      }
+    ]
+  },
+  "artifacts": {
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/task.json": "sha256:07e04e5b999f6351fd36aa6b6ef5af538446a94ebb313c10b8505dfb73582619",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/plan.md": "sha256:4102b105dc335e83ec97bc9b04f41594c621625712cca873e207774bee9d7ec1",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/setup.yaml": "sha256:7de8f30ff9a158c99db9943bb20e11660f7886e9cd3a1ae3952f78494537bc1c",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/active.yaml": "sha256:87a779582c662173d60cc01ca1ef55bc76c7d67bb507f72c6a1e06cf6c8e651f",
+    "/Users/samirsayyed/Desktop/proofloop/tasks/quiet-hours/end-restores-sound/ended.yaml": "sha256:ab0dbe9e325b1b958f6cd6753e77edadab620a4c090b090924fbab1b2a189b04",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-b41de64.apk": "sha256:ae2d097aaa55dbcb1d56199ef6d4523212a3d22169d870682995c3152c749ab1",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-end-hour-late-b41de64.apk": "sha256:3d154e2833de5634239b6cf108c30f148546a935b14ed7a4d97499ca2418375d",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-5.3.2.apk": "sha256:bc947e2b022feacfa74ab663d199ae86f5622902a9971ca5b4bf31fadf86cca2",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/bug-end-5min-early-b41de64.apk": "sha256:582f9c2041b450b8563ee0f63e0fd6b0e01eb5807188274dcb10bf814833bd75",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-3cdc546.apk": "sha256:25636a301fd5a620c7ac6ad3841fb467e408cec387ee5e09dd92baee0a5954d2",
+    "/Users/samirsayyed/Desktop/proofloop/.scratch/proofloop/apks/good-bcef12f.apk": "sha256:6c869878f20b373fa476201ffe73ef998657a045b130cba8e1e14cac40aa836a"
+  },
+  "approved_by": "agent (delegated by Samir in chat, 2026-11-23; added mined held-out bugs pre-fix-3cdc546 and pre-fix-bcef12f), 2026-11-23",
+  "approved_plan": "sha256:4102b105dc335e83ec97bc9b04f41594c621625712cca873e207774bee9d7ec1",
+  "author": {},
+  "verdict": "rejected_flaky",
+  "reason": "good build passed 0/10",
+  "seconds": 633.9,
+  "failure_label": "flaky"
+}

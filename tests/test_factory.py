@@ -35,6 +35,8 @@ class History(unittest.TestCase):
             history.append(t, rec("rejected_missed_bug", "2026-11-23T10:00:00", good="sha256:" + "c" * 64), "r4")
             s = history.summary(history.load(d))
             self.assertIn("stopped being proven on 2026-11-23 (build cccccccccccc: rejected_missed_bug) after 9 days", s)
+            history.append(t, rec("proven", "2026-11-24T10:00:00", good="sha256:" + "c" * 64), "r5")
+            self.assertIn("proven again on 2026-11-24 (build cccccccccccc)", history.summary(history.load(d)))
 
     def test_empty_and_never_proven(self):
         with tempfile.TemporaryDirectory() as d:
