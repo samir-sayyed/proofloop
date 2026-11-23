@@ -9,6 +9,11 @@ The verdict is plain code over run results:
   rejected_missed_bug  a proof bug passed, or failed somewhere other than its expected checkpoint
   proven               every good run passed and every proof bug failed at its expected checkpoint
 Held-out bugs run after the verdict and never change it.
+
+Run order: one good run, then every proof bug, then the remaining good runs. A test that misses a
+proof bug is rejected after about two runs, and the remaining good runs are skipped.
+The record keeps a sha256 of every file the proof used (task, plan, flows, APKs), so a published
+test can be checked against what was actually proven.
 """
 
 from __future__ import annotations
@@ -22,6 +27,7 @@ from . import RECORD_SCHEMA_VERSION, __version__
 from .device import DeviceError
 from .flow import check_task_flows
 from .label import label_record
+from .task import file_sha256
 
 POLICY_MARKERS = ("blocked command", "targets another app", "force-stops the app", "clearState", "must set stopApp")
 POLL_S = 1.0  # probe polling interval; tests set it to 0
@@ -125,6 +131,9 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
         "good": {"apk": str(task.good), "runs": [], "required": task.good_runs},
         "bugs": [],
         "environment": {},
+        # every input the proof used, by path; publish refuses a flow whose hash no longer matches
+        "artifacts": {str(p): file_sha256(p) for p in
+                      [task.path, task.plan_path, *task.flow_paths(), task.good, *(b.apk for b in task.bugs)]},
     }
 
     def finish(verdict, reason):
@@ -137,8 +146,11 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
         return record
 
     record["approved_by"] = task.approved_by
-    if not task.approved_by:
-        return finish("needs_human", "the checkpoint plan has no approval (set approved_by in task.json after a human approves it)")
+    record["approved_plan"] = task.approved_plan
+    declared = {cp for f in flows.values() for cp in f.checkpoints} | set(task.probe_checkpoints())
+    problem = task.approval_problem(declared)
+    if problem:
+        return finish("needs_human", problem)
     if not check.ok:
         policy = any(m in e for e in check.errors for m in POLICY_MARKERS)
         return finish("blocked_policy" if policy else "needs_human", "; ".join(check.errors))
@@ -147,16 +159,23 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
     try:
         device.free_automation_lock()
         record["environment"] = device.facts()
+        def good_runs(numbers):
+            """Run good-build runs. Returns a finished record, "stop" (fail-fast), or None."""
+            for n in numbers:
+                if over_budget():
+                    return finish("budget_exhausted", f"time budget of {task.budget_minutes} min ran out at good run {n}")
+                r = run_once(task, flows, device, maestro, "good", n, out_root)
+                record["good"]["runs"].append(asdict(r))
+                if r.environment:
+                    return finish("blocked_environment", f"good run {n}: {r.error}")
+                if not r.passed and fail_fast:
+                    return "stop"
+            return None
+
         device.install(task.good)
-        for n in range(1, task.good_runs + 1):
-            if over_budget():
-                return finish("budget_exhausted", f"time budget of {task.budget_minutes} min ran out at good run {n}")
-            r = run_once(task, flows, device, maestro, "good", n, out_root)
-            record["good"]["runs"].append(asdict(r))
-            if r.environment:
-                return finish("blocked_environment", f"good run {n}: {r.error}")
-            if not r.passed and fail_fast:
-                break
+        first = good_runs([1])
+        if isinstance(first, dict):
+            return first
 
         caught_all, missed = True, []
         for bug in [b for b in task.bugs if b.role == "proof"]:
@@ -173,11 +192,26 @@ def prove(task, device, maestro, out_root: Path, fail_fast: bool = False) -> dic
                 caught_all = False
                 missed.append(f"{bug.name} " + ("passed" if r.passed else f"failed at {r.checkpoint}, expected {bug.expect}"))
 
-        passes = sum(x["passed"] for x in record["good"]["runs"])
-        if passes < task.good_runs:
+        first_passed = record["good"]["runs"][0]["passed"]
+        if task.good_runs > 1:
+            # Skip only when run 1 passed: after a good-build failure, the full set of runs is what lets the
+            # labeller tell a flake from a real bug (one run would read as "fails every time").
+            if not caught_all and first_passed:
+                record["good"]["skipped"] = f"good runs 2-{task.good_runs} skipped: a proof bug was missed"
+            elif first != "stop":
+                device.install(task.good)
+                rest = good_runs(range(2, task.good_runs + 1))
+                if isinstance(rest, dict):
+                    return rest
+
+        runs = record["good"]["runs"]
+        passes = sum(x["passed"] for x in runs)
+        if passes < len(runs) or (caught_all and passes < task.good_runs):
             verdict, reason = "rejected_flaky", f"good build passed {passes}/{task.good_runs}"
         elif not caught_all:
             verdict, reason = "rejected_missed_bug", "; ".join(missed)
+            if "skipped" in record["good"]:
+                reason += f" ({record['good']['skipped']})"
         else:
             verdict, reason = "proven", f"passed {passes}/{task.good_runs}; every proof bug failed at its expected checkpoint"
 

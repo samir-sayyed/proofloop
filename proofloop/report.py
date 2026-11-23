@@ -7,6 +7,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from .task import file_sha256
+
 VERDICT_TEXT = {
     "proven": "Proven",
     "rejected_flaky": "Rejected: flaky on the good build",
@@ -14,7 +16,7 @@ VERDICT_TEXT = {
     "blocked_environment": "Blocked: device or tool failure (not evidence about the test)",
     "blocked_policy": "Blocked: the flow uses a command outside the allowlist",
     "budget_exhausted": "Stopped: time budget ran out",
-    "needs_human": "Needs a human: the flow cannot be checked",
+    "needs_human": "Needs a human: no approval covers this plan, or the flow cannot be checked",
 }
 
 
@@ -40,6 +42,8 @@ def render(record: dict) -> str:
             lines.append(f"| {r['run']} | {'pass' if r['passed'] else 'FAIL'} | {r['checkpoint'] or ''} | "
                          f"{r['step'] or ''} | {r['seconds']} |")
         lines.append("")
+        if g.get("skipped"):
+            lines += [f"_{g['skipped']}._", ""]
     if record["bugs"]:
         lines += ["**Seeded bugs:**", "", "| Bug | Role | Expected checkpoint | Failed at | Caught | Evidence |",
                   "|---|---|---|---|---|---|"]
@@ -57,6 +61,10 @@ def render(record: dict) -> str:
     if record.get("repairs"):
         lines += ["**Repairs made before this proof:**", ""]
         lines += [f"- {r.get('reason', '')}: {r.get('change', '')}" for r in record["repairs"]] + [""]
+    if record.get("artifacts"):
+        lines += ["**Proven against** (sha256, first 12 hex):", ""]
+        lines += [f"- `{Path(p).name}`: " + (f"`{h[7:19]}`" if h else "missing")
+                  for p, h in record["artifacts"].items()] + [""]
     env = record.get("environment", {})
     lines += [f"**Duration:** {record.get('seconds', 0) / 60:.1f} min. **Failure label:** `{record.get('failure_label')}`.",
               f"**Device:** {env.get('model', '?')}, Android {env.get('android', '?')}, host {env.get('host', '?')}.",
@@ -74,6 +82,13 @@ def publish(record_path, repo: Path, push: bool = False) -> str:
     record = load_record(record_path)
     if record["verdict"] != "proven":
         raise ValueError(f"refusing to publish: verdict is {record['verdict']}, not proven")
+    artifacts = record.get("artifacts")
+    if not artifacts:
+        raise ValueError("refusing to publish: the record has no artifact hashes (made before record schema 2); "
+                         "run proofloop prove again")
+    for f in record["flows"]:
+        if file_sha256(f) != artifacts.get(f):
+            raise ValueError(f"refusing to publish: {Path(f).name} changed since it was proven; run proofloop prove again")
     repo = Path(repo).resolve()
     slug = record["task"].replace("/", "-")
     branch = f"proofloop/{slug}"

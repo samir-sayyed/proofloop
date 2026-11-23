@@ -2,7 +2,7 @@
   "name": "sunflower/garden-planting",
   "criterion": "Adding a plant to the garden lists it on the My garden tab with today's planting date.",
   "app_id": "com.google.samples.apps.sunflower",
-  "approved_by": "agent under owner's instruction to take decisions, 2026-11-14 (plan.md)",
+  "approved_by": "Samir, 2026-11-23",
   "good": "../../../.scratch/proofloop/apks/sunflower-good.apk",
   "bugs": [
     {
@@ -33,5 +33,6 @@
       "reason": "a proof bug failed at setup, not C2: the first wait expected 'Your garden is empty', which a garden bug can change",
       "change": "wait for the 'Plant list' tab, present in every state; no checkpoint changed"
     }
-  ]
+  ],
+  "approved_plan": "sha256:035786307f586d852b4265a9e973981187d1862c31a0a0f35d8ecb897e94ea1f"
 }

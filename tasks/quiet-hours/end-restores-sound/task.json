@@ -2,7 +2,7 @@
   "name": "quiet-hours/end-restores-sound",
   "criterion": "A Silent schedule restores normal sound at its end time, and Home shows it active during the window and the next start after it.",
   "app_id": "com.sam.quiethours",
-  "approved_by": "samirsayyed, 2026-11-14 (first-criterion grilling, E1-E2; status checks added by agent)",
+  "approved_by": "Samir, 2026-11-23",
   "good": "../../../.scratch/proofloop/apks/good-e4ba3eb.apk",
   "bugs": [
     {
@@ -82,5 +82,6 @@
       "reason": "status flows force-stopped the app and cancelled its END alarm",
       "change": "launchApp stopApp: false; force-stop blocked by the flow checker"
     }
-  ]
+  ],
+  "approved_plan": "sha256:4102b105dc335e83ec97bc9b04f41594c621625712cca873e207774bee9d7ec1"
 }

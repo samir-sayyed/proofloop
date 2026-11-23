@@ -1,6 +1,7 @@
 """Fast tests through the public seam: task file in, run record out. Fake device and fake Maestro."""
 
 import json
+import re
 import subprocess
 import tempfile
 import unittest
@@ -12,7 +13,7 @@ from proofloop.evals import table
 from proofloop.flow import check_flow, parse_flow
 from proofloop.maestro import FlowResult, parse_commands
 from proofloop.report import publish, render
-from proofloop.task import TaskError, load_task
+from proofloop.task import TaskError, approve, file_sha256, load_task, plan_ids
 import proofloop.verify
 from proofloop.verify import flake_upper_bound, prove
 
@@ -88,7 +89,9 @@ def fails_at(index, error="Assertion is false"):
 
 
 class TaskDir:
-    def __init__(self, flow=FLOW, **overrides):
+    """A task folder with an approved plan.md that lists exactly the flow's and probes' checkpoints."""
+
+    def __init__(self, flow=FLOW, plan=None, **overrides):
         d = Path(tempfile.mkdtemp(dir=_ROOT.name))
         (d / "flow.yaml").write_text(flow)
         for name in ("good", "bug-proof", "bug-held"):
@@ -102,6 +105,12 @@ class TaskDir:
             "good_runs": 10, "steps": [{"flow": "flow.yaml"}], "approved_by": "tester",
         }
         task.update(overrides)
+        if plan is None:
+            ids = re.findall(r"^# checkpoint: (\S+)", flow, re.M) + \
+                  [s["probe"]["checkpoint"] for s in task["steps"] if "probe" in s]
+            plan = "# Plan\n\n" + "".join(f"- {i} something observable\n" for i in ids)
+        (d / "plan.md").write_text(plan)
+        task.setdefault("approved_plan", file_sha256(d / "plan.md"))
         (d / "task.json").write_text(json.dumps(task))
         self.path = d / "task.json"
         self.dir = d
@@ -179,6 +188,43 @@ class ProveVerdicts(unittest.TestCase):
         self.assertEqual(rec["failure_label"], "real_bug_in_good_build")
 
 
+class RunOrder(unittest.TestCase):
+    def test_proof_bugs_run_after_the_first_good_run(self):
+        d = FakeDevice()
+        rec = TaskDir().prove(d, by_build(proof=fails_at(4)))
+        self.assertEqual(rec["verdict"], "proven")
+        installs = [c for c in d.calls if c.startswith("install")]
+        self.assertEqual(installs, ["install good", "install bug-proof", "install good", "install bug-held", "install good"])
+        self.assertEqual(len(rec["good"]["runs"]), 10)
+        self.assertNotIn("skipped", rec["good"])
+
+    def test_missed_proof_bug_skips_the_remaining_good_runs(self):
+        rec = TaskDir().prove(FakeDevice(), by_build(proof=fails_at(2)))
+        self.assertEqual(rec["verdict"], "rejected_missed_bug")
+        self.assertEqual(len(rec["good"]["runs"]), 1)
+        self.assertIn("2-10 skipped", rec["good"]["skipped"])
+        self.assertIn("skipped", rec["reason"])
+        self.assertIn("skipped", render(rec))
+        self.assertEqual(rec["failure_label"], "missed_bug")
+
+    def test_good_failure_still_wins_over_a_missed_bug_and_runs_all_good_runs(self):
+        rec = TaskDir().prove(FakeDevice(), by_build(good=fails_at(4)))
+        self.assertEqual(rec["verdict"], "rejected_flaky")
+        self.assertEqual(len(rec["good"]["runs"]), 10)
+        self.assertNotIn("skipped", rec["good"])
+        self.assertEqual(rec["failure_label"], "real_bug_in_good_build")  # judged on 10 runs, not 1
+
+    def test_one_flake_on_run_one_with_a_missed_bug_is_labelled_flaky(self):
+        rec = TaskDir().prove(FakeDevice(), by_build(good=lambda n: fails_at(4) if n == 1 else FlowResult(True)))
+        self.assertEqual(len(rec["good"]["runs"]), 10)
+        self.assertEqual(rec["failure_label"], "flaky")
+
+    def test_single_good_run_task(self):
+        rec = TaskDir(good_runs=1).prove(FakeDevice(), by_build(proof=fails_at(4)))
+        self.assertEqual(rec["verdict"], "proven")
+        self.assertEqual(len(rec["good"]["runs"]), 1)
+
+
 class ApprovalGate(unittest.TestCase):
     def test_unapproved_plan_never_reaches_the_device(self):
         device = FakeDevice()
@@ -186,6 +232,67 @@ class ApprovalGate(unittest.TestCase):
         self.assertEqual(rec["verdict"], "needs_human")
         self.assertIn("approval", rec["reason"])
         self.assertEqual(device.calls, [])
+
+    def test_approval_not_bound_to_a_plan_needs_a_human(self):
+        device = FakeDevice()
+        rec = TaskDir(approved_plan=None).prove(device)
+        self.assertEqual(rec["verdict"], "needs_human")
+        self.assertIn("not bound to plan.md", rec["reason"])
+        self.assertEqual(device.calls, [])
+
+    def test_plan_edited_after_approval_needs_a_human(self):
+        t = TaskDir()
+        (t.dir / "plan.md").write_text((t.dir / "plan.md").read_text() + "- C4 one more\n")
+        rec = t.prove(FakeDevice())
+        self.assertEqual(rec["verdict"], "needs_human")
+        self.assertIn("changed since it was approved", rec["reason"])
+
+    def test_flow_checkpoints_must_match_the_approved_plan(self):
+        dropped = "# Plan\n- C1 form opens\n- C2 item listed\n"  # the flow also declares C3
+        rec = TaskDir(plan=dropped).prove(FakeDevice())
+        self.assertEqual(rec["verdict"], "needs_human")
+        self.assertIn("not in the approved plan: C3", rec["reason"])
+        extra = dropped + "- C3 status\n- C9 never written\n"
+        rec = TaskDir(plan=extra).prove(FakeDevice())
+        self.assertIn("in the plan but not in any flow or probe: C9", rec["reason"])
+
+    def test_approve_binds_the_plan_and_unblocks_prove(self):
+        t = TaskDir(approved_plan=None)
+        msg = approve(t.path, "Samir", "2026-11-23")
+        self.assertIn("C1, C2, C3", msg)
+        raw = json.loads(t.path.read_text())
+        self.assertEqual(raw["approved_by"], "Samir, 2026-11-23")
+        self.assertEqual(raw["approved_plan"], file_sha256(t.dir / "plan.md"))
+        self.assertEqual(t.prove(FakeDevice(), by_build(proof=fails_at(4)))["verdict"], "proven")
+
+    def test_approve_names_a_probe_id_without_a_digit(self):
+        steps = [{"flow": "flow.yaml"}, {"probe": {"checkpoint": "S", "expect": "quiet"}}]
+        t = TaskDir(steps=steps, approved_plan=None)
+        self.assertIn("C1, C2, C3, S", approve(t.path, "Samir", "2026-11-23"))
+
+    def test_approve_needs_a_plan_with_checkpoints(self):
+        t = TaskDir(plan="# Plan\n\nNothing numbered here.\n")
+        with self.assertRaises(TaskError):
+            approve(t.path, "Samir", "2026-11-23")
+        (t.dir / "plan.md").unlink()
+        with self.assertRaises(TaskError):
+            approve(t.path, "Samir", "2026-11-23")
+
+    def test_plan_id_formats(self):
+        text = "- C1 the wizard opens\n- A2: saved screen\n* **E1s** status\n- Note: not a checkpoint\n  - C7) nested\n"
+        self.assertEqual(plan_ids(text), {"C1", "A2", "E1s", "C7"})
+        # an id without a digit (a probe named "S") counts only when a flow or probe declares it
+        self.assertEqual(plan_ids("- S phone silenced\n- Note x\n", {"S"}), {"S"})
+
+
+class Artifacts(unittest.TestCase):
+    def test_record_hashes_every_input(self):
+        t = TaskDir()
+        rec = t.prove(FakeDevice(), by_build(proof=fails_at(4)))
+        arts = rec["artifacts"]
+        for name in ("task.json", "plan.md", "flow.yaml", "good.apk", "bug-proof.apk", "bug-held.apk"):
+            self.assertEqual(arts[str((t.dir / name).resolve())], file_sha256(t.dir / name))
+        self.assertIn("Proven against", render(rec))
 
 
 class FlowPolicy(unittest.TestCase):
@@ -345,6 +452,24 @@ class Publishing(unittest.TestCase):
             files = git("show", "--name-only", "--format=").split()
             self.assertIn(".maestro/proofloop/example-item-listed/flow.yaml", files)
             self.assertIn(".maestro/proofloop/example-item-listed/proofloop-report.md", files)
+
+    def test_flow_edited_after_proof_is_not_published(self):
+        t = TaskDir()
+        rec = t.prove(FakeDevice(), by_build(proof=fails_at(4)))
+        p = t.dir / "record.json"
+        p.write_text(json.dumps(rec))
+        (t.dir / "flow.yaml").write_text(FLOW.replace('"Item"', '"Item.*"'))
+        with self.assertRaisesRegex(ValueError, "changed since it was proven"):
+            publish(p, t.dir)
+
+    def test_record_without_hashes_is_not_published(self):
+        t = TaskDir()
+        rec = t.prove(FakeDevice(), by_build(proof=fails_at(4)))
+        del rec["artifacts"]
+        p = t.dir / "record.json"
+        p.write_text(json.dumps(rec))
+        with self.assertRaisesRegex(ValueError, "no artifact hashes"):
+            publish(p, t.dir)
 
     def test_results_table(self):
         rec = TaskDir().prove(FakeDevice(), by_build(proof=fails_at(4), held=fails_at(5)))

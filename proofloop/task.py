@@ -14,6 +14,7 @@ A task is a JSON file. Paths inside it are relative to the file. Example:
   "device": {"timezone": "Asia/Kolkata", "clock": "2026-11-18T08:00:00",
              "grants": ["android.permission.POST_NOTIFICATIONS"], "dnd_access": false},
   "approved_by": "who approved the checkpoint plan, and when",
+  "approved_plan": "sha256 of plan.md at approval (written by `proofloop approve`)",
   "good_runs": 10,
   "budget_minutes": 60,
   "steps": [
@@ -35,13 +36,35 @@ Step kinds:
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, time
 from pathlib import Path
 
 PROBE_STATES = ("quiet", "normal")
 ROLES = ("proof", "held_out")
+# A checkpoint line in plan.md starts with its id: "- C1 the wizard opens", "- A2: ...", "- **E1s** ...".
+PLAN_LINE_RE = re.compile(r"^\s*[-*]\s+\**([A-Za-z][A-Za-z0-9_-]*)\**(?=[\s:.)]|$)")
+
+
+def file_sha256(path) -> str | None:
+    """sha256 of a file as 'sha256:<hex>', or None if it does not exist."""
+    try:
+        with open(path, "rb") as f:
+            return "sha256:" + hashlib.file_digest(f, "sha256").hexdigest()
+    except FileNotFoundError:
+        return None
+
+
+def plan_ids(text: str, declared: set[str] = frozenset()) -> set[str]:
+    """Checkpoint ids a plan lists: a bullet's first word, if it has a digit (C1) or is a declared id (S).
+
+    ponytail: first-word heuristic, so prose bullets ("- Note: ...") are ignored unless they name a checkpoint.
+    """
+    words = {m.group(1) for line in text.splitlines() if (m := PLAN_LINE_RE.match(line))}
+    return {w for w in words if any(ch.isdigit() for ch in w) or w in declared}
 
 
 class TaskError(ValueError):
@@ -78,10 +101,34 @@ class Task:
     budget_minutes: float | None = None
     repairs: list[dict] = field(default_factory=list)
     approved_by: str | None = None  # human approval of the checkpoint plan; prove refuses without it
+    approved_plan: str | None = None  # sha256 of plan.md when it was approved (set by `proofloop approve`)
 
     @property
     def dir(self) -> Path:
         return self.path.parent
+
+    @property
+    def plan_path(self) -> Path:
+        return self.dir / "plan.md"
+
+    def approval_problem(self, declared: set[str]) -> str | None:
+        """Why the approval does not cover what will run, or None. declared: checkpoint ids in flows and probes."""
+        if not self.approved_by:
+            return "the checkpoint plan has no approval (a human reviews plan.md, then runs proofloop approve TASK --by NAME)"
+        if not self.approved_plan:
+            return "the approval is not bound to plan.md (a human reviews plan.md, then runs proofloop approve TASK --by NAME)"
+        actual = file_sha256(self.plan_path)
+        if actual is None:
+            return "plan.md is missing; the approval has nothing to cover"
+        if actual != self.approved_plan:
+            return "plan.md changed since it was approved; a human must review it and approve again"
+        planned = plan_ids(self.plan_path.read_text(), declared)
+        extra, missing = sorted(declared - planned), sorted(planned - declared)
+        if extra or missing:
+            parts = ([f"not in the approved plan: {', '.join(extra)}"] if extra else []) + \
+                    ([f"in the plan but not in any flow or probe: {', '.join(missing)}"] if missing else [])
+            return "the flows do not match the approved plan's checkpoints (" + "; ".join(parts) + ")"
+        return None
 
     def flow_paths(self) -> list[Path]:
         return [self.dir / s["flow"] for s in self.steps if "flow" in s]
@@ -169,4 +216,31 @@ def load_task(path: str | Path) -> Task:
         budget_minutes=raw.get("budget_minutes"),
         repairs=list(raw.get("repairs", [])),
         approved_by=raw.get("approved_by"),
+        approved_plan=raw.get("approved_plan"),
     )
+
+
+def approve(task_path: str | Path, by: str, today: str) -> str:
+    """Bind a human's approval to the current plan.md: write approved_by and approved_plan into task.json.
+
+    Reads the JSON directly, so it works before the flows exist.
+    """
+    task_path = Path(task_path).resolve()
+    plan = task_path.parent / "plan.md"
+    digest = file_sha256(plan)
+    if digest is None:
+        raise TaskError(f"no plan.md next to {task_path.name}; write the checkpoint plan first")
+    raw = json.loads(task_path.read_text())
+    # ids without a digit (a probe named S) count when a probe or an existing flow declares them
+    from .flow import parse_flow
+    declared = {s["probe"]["checkpoint"] for s in raw.get("steps", []) if "probe" in s}
+    for s in raw.get("steps", []):
+        if "flow" in s and (task_path.parent / s["flow"]).is_file():
+            declared |= set(parse_flow(task_path.parent / s["flow"]).checkpoints)
+    ids = plan_ids(plan.read_text(), declared)
+    if not ids:
+        raise TaskError("plan.md lists no checkpoints (lines like '- C1 the wizard opens')")
+    raw["approved_by"] = f"{by}, {today}"
+    raw["approved_plan"] = digest
+    task_path.write_text(json.dumps(raw, indent=2, ensure_ascii=False) + "\n")
+    return f"approved plan.md ({', '.join(sorted(ids))}; {digest[:19]}) by {by}"

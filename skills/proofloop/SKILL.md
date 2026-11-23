@@ -31,9 +31,15 @@ You see the criterion and the good build, nothing else, so the test cannot be fi
 
 Turn the criterion into numbered checkpoints, each an observable condition: text or a control on
 screen, or a device state the runner can probe (sound: quiet or normal). Write them to `plan.md`
-in the task directory. If part of the criterion cannot be observed through the UI or a probe,
-say so and stop; do not write a hollow test. Ask the human to approve or edit the plan before
-exploring. Skip approval only for checked-in eval tasks that were already approved.
+in the task directory, one per line starting with its id: `- C1 the wizard opens`. If part of the
+criterion cannot be observed through the UI or a probe, say so and stop; do not write a hollow test.
+
+Ask the human to approve or edit the plan before exploring. **The human runs
+`proofloop approve TASK --by NAME`**; you never run it. It binds the approval to this exact `plan.md`.
+`prove` returns `needs_human` if `plan.md` changes afterwards, or if the flows and probes declare
+checkpoint ids that differ from the plan's. So use exactly the approved ids in your
+`# checkpoint:` markers. If a repair needs a checkpoint added, dropped or reworded, edit `plan.md`
+and ask the human to approve again.
 
 ### 2. Explore the good build
 
@@ -75,8 +81,10 @@ what fixed it into `learned.md` for the next session.
 
 ### 4. Prove
 
-`proofloop prove TASK`. It runs the good build `good_runs` times from a clean reset, then each
-proof bug once, then held-out bugs, and writes `record.json` and `report.md`.
+`proofloop prove TASK`. It runs the good build once, then each proof bug once, then the remaining
+good runs (skipped if a proof bug was missed), then held-out bugs, all from a clean reset. It writes
+`record.json` (with a sha256 of every flow, plan and APK it used) and `report.md`. Do not edit a
+flow after its proof: `publish` refuses a flow whose hash no longer matches the record.
 
 ### 5. Repair, at most twice
 

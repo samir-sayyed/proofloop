@@ -1,6 +1,7 @@
 """proofloop command line.
 
   proofloop check  TASK            check flows: allowlist, checkpoints, coordinate fallbacks
+  proofloop approve TASK --by NAME bind a human's approval to the current plan.md (run by the human)
   proofloop prove  TASK [--out D]  run the proof on a device and write the run record and report
   proofloop report RECORD          print the report for a run record
   proofloop publish RECORD --repo PATH [--push]   commit a proven test to the app repo (and open a PR)
@@ -27,7 +28,7 @@ from pathlib import Path
 from .device import DeviceError
 from .flow import check_task_flows
 from .report import load_record, publish, render
-from .task import TaskError, load_task
+from .task import TaskError, approve, load_task
 
 
 def _device(args):
@@ -52,8 +53,17 @@ def cmd_check(args) -> int:
         print(f"ERROR {e}")
     for f in result.fallbacks:
         print(f"FLAG  {f}")
+    # Approval is a human step, so it is reported but never fails `check` (prove enforces it).
+    declared = {cp for f in flows.values() for cp in f.checkpoints} | set(task.probe_checkpoints())
+    problem = task.approval_problem(declared)
+    print(f"WARN  approval: {problem}" if problem else "approval: plan.md approved and matches the flows")
     print("ok" if result.ok else "not ok")
     return 0 if result.ok else 1
+
+
+def cmd_approve(args) -> int:
+    print(approve(args.task, args.by, datetime.now().date().isoformat()))
+    return 0
 
 
 def cmd_prove(args) -> int:
@@ -252,6 +262,9 @@ def main(argv=None) -> int:
     p.add_argument("--device", help="adb serial (default: the only connected device)")
     sub = p.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("check"); s.add_argument("task"); s.set_defaults(fn=cmd_check)
+    s = sub.add_parser("approve", help="bind a human's approval to the current plan.md")
+    s.add_argument("task"); s.add_argument("--by", required=True, help="who approved the plan")
+    s.set_defaults(fn=cmd_approve)
     s = sub.add_parser("prove"); s.add_argument("task"); s.add_argument("--out"); s.add_argument("--runs", type=int)
     s.add_argument("--fail-fast", action="store_true", help="stop good runs at the first failure")
     s.add_argument("--no-learn", dest="learn", action="store_false", help="do not update the app memory"); s.set_defaults(fn=cmd_prove)

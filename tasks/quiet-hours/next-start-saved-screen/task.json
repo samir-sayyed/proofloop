@@ -2,7 +2,7 @@
   "name": "quiet-hours/next-start-saved-screen",
   "criterion": "After a Weekdays schedule is activated on a Wednesday morning, the Routine saved screen states the next start as today at 9:00 AM.",
   "app_id": "com.sam.quiethours",
-  "approved_by": "agent under owner's instruction to take decisions, 2026-11-17 (plan.md)",
+  "approved_by": "Samir, 2026-11-23",
   "good": "../../../.scratch/proofloop/apks/good-e4ba3eb.apk",
   "bugs": [
     {
@@ -15,9 +15,16 @@
   "device": {
     "timezone": "Asia/Kolkata",
     "clock": "2026-11-18T08:00:00",
-    "grants": ["android.permission.POST_NOTIFICATIONS"]
+    "grants": [
+      "android.permission.POST_NOTIFICATIONS"
+    ]
   },
   "good_runs": 10,
   "budget_minutes": 40,
-  "steps": [{"flow": "flow.yaml"}]
+  "steps": [
+    {
+      "flow": "flow.yaml"
+    }
+  ],
+  "approved_plan": "sha256:077f36fa71e68a2e2f829bb59985569878443235c038ae79f9c2ced6618a7f1a"
 }

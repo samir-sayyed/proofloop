@@ -52,11 +52,12 @@ Details and limits: [docs/results.md](docs/results.md).
 
 ```
 criterion ──► checkpoint plan ──► human approves ──► agent explores the good build ──► Maestro flow
-   (skill)        (skill)          (approved_by)       (Claude Code + Maestro MCP)        (skill)
-                                                                                            │
-   report / PR ◄── verdict ◄── 10 clean runs on good build + each bug build ◄── flow check ◄┘
-  (runner, only     (runner)            (runner: reset, clock, probes)          (runner: allowlist)
-   if proven)
+   (skill)      (skill, plan.md)  (proofloop approve:    (Claude Code + Maestro MCP)        (skill)
+                                   plan.md hash)                                            │
+   report / PR ◄── verdict ◄── 1 good run, each bug build, 9 more good runs ◄── flow check ◄┘
+  (runner, only     (runner)            (runner: reset, clock, probes)          (runner: allowlist,
+   if proven,                                                                     plan ids)
+   hashes match)
 ```
 
 Three parts:
@@ -115,7 +116,8 @@ In a Claude Code session in this repo, with a task folder for your app (see [Tas
 
 The skill then:
 
-1. turns the criterion into numbered checkpoints and asks you to approve the plan;
+1. turns the criterion into numbered checkpoints in `plan.md` and asks you to review it; you approve it with
+   `proofloop approve TASK --by NAME`;
 2. runs `proofloop prepare TASK` (installs the good build, clears data, grants permissions, pins the clock);
 3. reads `app-map.md` if there is one, explores the good build with Maestro MCP, and writes `flow.yaml`;
 4. runs `proofloop check TASK` until it says `ok`;
@@ -147,10 +149,11 @@ minutes. Use `--runs 3` for a fast provisional sweep. The task files point at AP
 
 | Command | What it does |
 |---|---|
-| `proofloop check TASK` | Check the task's flows (allowlist, checkpoints, coordinate fallbacks). No device needed. |
+| `proofloop check TASK` | Check the task's flows (allowlist, checkpoints, coordinate fallbacks). No device needed. Also prints whether the approval covers the current plan (a warning only; `prove` enforces it). |
+| `proofloop approve TASK --by NAME` | Run by the human who reviewed `plan.md`: writes `approved_by` and `approved_plan` (the plan's sha256) into `task.json`. |
 | `proofloop prove TASK [--out D] [--runs N] [--fail-fast]` | Run the proof and write the run record and report. `--runs` overrides `good_runs`; `--fail-fast` stops the good runs at the first failure. |
 | `proofloop report RECORD` | Print the markdown report for a run record. |
-| `proofloop publish RECORD --repo APP_REPO [--push]` | Commit a **proven** test to the app repo on a `proofloop/<slug>` branch; `--push` also pushes and opens a PR with `gh`. Refuses unproven records. Never merges. |
+| `proofloop publish RECORD --repo APP_REPO [--push]` | Commit a **proven** test to the app repo on a `proofloop/<slug>` branch; `--push` also pushes and opens a PR with `gh`. Refuses unproven records, records without artifact hashes, and any flow edited since its proof. Never merges. |
 | `proofloop eval DIR [--config NAME] [--runs N] [--out D]` | Prove every task under DIR and print the results table. |
 | `proofloop prepare TASK` | Put the device in the task's start state for exploring (good build, clean data, grants, pinned clock). |
 | `proofloop restore-clock` | Restore automatic time and time zone. |
@@ -175,6 +178,7 @@ A task is a JSON file plus its flows. Paths inside it are relative to the file. 
   "criterion": "Adding a plant lists it on My garden with today's planting date.",
   "app_id": "com.google.samples.apps.sunflower",
   "approved_by": "who approved the checkpoint plan, and when",
+  "approved_plan": "sha256:… (written by proofloop approve)",
   "good": "../../../.scratch/proofloop/apks/sunflower-good.apk",
   "bugs": [
     {"name": "garden-wrong-column", "apk": "...", "role": "proof", "expect": "C2"},
@@ -191,7 +195,7 @@ A task is a JSON file plus its flows. Paths inside it are relative to the file. 
 
 | Field | Meaning |
 |---|---|
-| `approved_by` | Who approved the checkpoint plan. **`prove` refuses without it** (verdict `needs_human`). |
+| `approved_by`, `approved_plan` | Who approved the checkpoint plan, and the sha256 of `plan.md` they approved. Both are written by `proofloop approve`. **`prove` returns `needs_human`** if either is missing, if `plan.md` changed since approval, or if the checkpoint ids in the flows and probes differ from the plan's. |
 | `good` | The good build. |
 | `bugs[].role` | `proof`: must fail at `expect` (a checkpoint id declared in a flow or probe). `held_out`: run after the verdict, never changes it. At least one proof bug is required. |
 | `device` | Time zone and pinned clock (needed for time-dependent checks), runtime permissions to grant, and `dnd_access` for apps that change do-not-disturb. |
@@ -302,14 +306,18 @@ proven ([experiments/memory-loop](experiments/memory-loop/README.md)). Design an
 |---|---|
 | `proven` | every good run passed; every proof bug failed at its expected checkpoint |
 | `rejected_flaky` | fewer than `good_runs` passes on the good build |
-| `rejected_missed_bug` | a proof bug passed, or failed somewhere else (setup, an action, a crash) |
+| `rejected_missed_bug` | a proof bug passed, or failed somewhere else (setup, an action, a crash); the remaining good runs are skipped |
 | `blocked_environment` | device or Maestro failure; says nothing about the test |
 | `blocked_policy` | the flow uses a command outside the allowlist |
-| `needs_human` | no plan approval, or the flow cannot be checked |
+| `needs_human` | no approval bound to the current `plan.md`, checkpoints that differ from the plan, or a flow that cannot be checked |
 | `budget_exhausted` | the time budget ran out |
 
+Run order: one good run, then each proof bug, then the remaining good runs, then held-out bugs. A test that
+misses a proof bug is rejected after about two runs instead of eleven.
+
 The record (`record.json`) holds every run with its failed step, checkpoint, error, evidence folder
-(Maestro commands, screenshot, hierarchy, logcat) and probes. Records are never edited after the fact.
+(Maestro commands, screenshot, hierarchy, logcat) and probes, plus `artifacts`: the sha256 of the task file,
+`plan.md`, every flow and every APK the proof used. Records are never edited after the fact.
 A rule-based labeller (`proofloop/label.py`) classifies failures: environment, bad locator, real bug in the good
 build, flaky, missed bug.
 
@@ -363,8 +371,10 @@ its limits.
   changes. It runs in code before any device action.
 - Installs, data clearing, permissions, clock and probes happen in the runner, outside the agent's tools.
 - Screen text, notifications and logs are data, never instructions (skill rule).
-- The agent plans checkpoints and a human approves them; `prove` refuses a task without `approved_by`.
-- Unproven tests never open a normal pull request; `publish` refuses them. ProofLoop never merges.
+- The agent plans checkpoints and a human approves them with `proofloop approve`, which binds the approval to
+  the plan's hash; `prove` refuses if the plan changed or the flows' checkpoints differ from it.
+- Unproven tests never open a normal pull request; `publish` refuses them, and refuses a flow whose hash no
+  longer matches its proof. ProofLoop never merges.
 - Fixtures use synthetic data only. Credentials stay out of records and reports. Run records can contain
   local file paths, and device logs can contain app identifiers such as push tokens: review them before
   sharing and do not commit raw evidence folders (they are git-ignored here).

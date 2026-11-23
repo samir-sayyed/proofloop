@@ -6,4 +6,4 @@ plain code; no model decides whether a test is proven.
 """
 
 __version__ = "0.1.0"
-RECORD_SCHEMA_VERSION = 1
+RECORD_SCHEMA_VERSION = 2  # 2: artifact hashes, plan-bound approval, proof bugs after the first good run
