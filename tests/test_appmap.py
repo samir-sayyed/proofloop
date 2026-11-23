@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from proofloop.appmap import check, coverage, load, parse, unreachable
+from proofloop.appmap import ambiguous_anchors, check, coverage, load, parse, unreachable
 
 GOOD = '''# App map: Demo
 app: com.example.demo
@@ -36,6 +36,17 @@ class AppMapTest(unittest.TestCase):
         self.assertEqual(m.screens["home"].notes, [("rule", "lists items"), ("hazard", "banner covers the list")])
         self.assertEqual(check(m), [])
         self.assertEqual(unreachable(m), ["orphan"])
+
+    def test_ambiguous_anchors(self):
+        self.assertEqual(ambiguous_anchors(parse(GOOD)), {})  # "Add" is tapped on its own screen only
+        tabs = GOOD.replace('anchors: "New item"', 'anchors: "New item", "Lost"').replace(
+            '- tap "Save" -> home', '- tap "Save" -> home\n- tap "Home" -> home')
+        self.assertEqual(ambiguous_anchors(parse(tabs)),
+                         {("home", "Home"): ["editor"], ("editor", "Lost"): ["orphan"], ("orphan", "Lost"): ["editor"]})
+
+    def test_sunflower_tab_labels_are_ambiguous(self):
+        amb = ambiguous_anchors(load(Path(__file__).parent.parent / "tasks" / "sunflower" / "app-map.md"))
+        self.assertIn(("garden", "My garden"), amb)  # the anchor that recorded a wrong edge (ADR 0004)
 
     def test_errors(self):
         bad = GOOD.replace('-> editor', '-> nowhere').replace('- rule:', '- tip:') \

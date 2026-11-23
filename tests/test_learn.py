@@ -69,6 +69,17 @@ class LearnTest(unittest.TestCase):
         self.assertNotIn("edge|editor|Save|saved", mem.facts)
         self.assertEqual(mem.status(mem.facts["edge|home|Add|editor"]), "confirmed")
 
+    def test_a_tab_label_anchor_does_not_identify_its_screen(self):
+        # "Saved title" is also a tab on home (tapped there), like Sunflower's "My garden": seeing it
+        # on home must not record home -> saved.
+        (self.app / "app-map.md").write_text(MAP.replace('- tap "Add" -> editor', '- tap "Add" -> editor\n- tap "Saved title" -> saved'))
+        mem = Memory(self.app)
+        self.assertNotIn("Saved title", mem.anchor_screen)
+        run = [cmd("visible", "Home title"), cmd("visible", "Saved title"), cmd("tap", "Add"), cmd("visible", "Editor title")]
+        mem.ingest_session("t1", "good-1", self.attempt("t1", run))
+        self.assertNotIn("edge|saved|Add|editor", mem.facts)
+        self.assertIn("edge|home|Add|editor", mem.facts)
+
     def test_exact_text_passing_later_contradicts_the_locator_fact(self):
         mem = Memory(self.app)
         base = [cmd("visible", "Saved title")]

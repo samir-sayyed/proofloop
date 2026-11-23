@@ -43,6 +43,11 @@ def _maestro(device):
 
 def cmd_check(args) -> int:
     task = load_task(args.task)
+    if args.fix:
+        from .flow import fix_flow, task_anchors
+        for p in task.flow_paths():
+            for f in fix_flow(p, task_anchors(task)):
+                print(f"FIXED {p.name}: {f}")
     result, flows = check_task_flows(task)
     for p, f in flows.items():
         cps = ", ".join(sorted(f.checkpoints)) or "none"
@@ -234,7 +239,7 @@ def cmd_learn(args) -> int:
 
 
 def cmd_map(args) -> int:
-    from .appmap import check, coverage, load, unreachable
+    from .appmap import ambiguous_anchors, check, coverage, load, unreachable
     m = load(args.map)
     errs = check(m)
     n_edges = sum(len(s.edges) for s in m.screens.values())
@@ -242,6 +247,13 @@ def cmd_map(args) -> int:
     print(f"{m.app}: {len(m.screens)} screens, {n_edges} actions, {n_notes} notes, {len(m.routes)} routes")
     for e in errs:
         print(f"ERROR {e}")
+    amb = ambiguous_anchors(m)
+    for (sid, a), others in amb.items():
+        print(f"WARN  anchor \"{a}\" of '{sid}' is also on {', '.join(others)}; it cannot identify the screen "
+              "(the learner ignores it)")
+    for s in m.screens.values():
+        if s.anchors and all((s.id, a) in amb for a in s.anchors):
+            print(f"WARN  screen '{s.id}' has no anchor unique to it; add text only this screen shows")
     for s in unreachable(m):
         print(f"FLAG  screen '{s}' is not reachable from '{next(iter(m.screens))}'")
     if args.flows:
@@ -261,7 +273,9 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="proofloop", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--device", help="adb serial (default: the only connected device)")
     sub = p.add_subparsers(dest="cmd", required=True)
-    s = sub.add_parser("check"); s.add_argument("task"); s.set_defaults(fn=cmd_check)
+    s = sub.add_parser("check"); s.add_argument("task")
+    s.add_argument("--fix", action="store_true", help="apply the fixes with one right answer (launchApp options, "
+                   "marker above its gating wait), then check"); s.set_defaults(fn=cmd_check)
     s = sub.add_parser("approve", help="bind a human's approval to the current plan.md")
     s.add_argument("task"); s.add_argument("--by", required=True, help="who approved the plan")
     s.set_defaults(fn=cmd_approve)

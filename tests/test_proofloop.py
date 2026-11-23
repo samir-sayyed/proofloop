@@ -10,10 +10,10 @@ from pathlib import Path
 
 from proofloop.device import DeviceError
 from proofloop.evals import table
-from proofloop.flow import check_flow, parse_flow
+from proofloop.flow import check_flow, fix_flow, parse_flow
 from proofloop.maestro import FlowResult, parse_commands
 from proofloop.report import publish, render
-from proofloop.task import TaskError, approve, file_sha256, load_task, plan_ids
+from proofloop.task import TaskError, approve, bugs_digest, file_sha256, load_task, plan_ids
 import proofloop.verify
 from proofloop.verify import flake_upper_bound, prove
 
@@ -111,6 +111,8 @@ class TaskDir:
             plan = "# Plan\n\n" + "".join(f"- {i} something observable\n" for i in ids)
         (d / "plan.md").write_text(plan)
         task.setdefault("approved_plan", file_sha256(d / "plan.md"))
+        task.setdefault("approved_bugs", bugs_digest(
+            [(b["name"], b.get("role", "proof"), b.get("expect")) for b in task["bugs"]]))
         (d / "task.json").write_text(json.dumps(task))
         self.path = d / "task.json"
         self.dir = d
@@ -265,6 +267,30 @@ class ApprovalGate(unittest.TestCase):
         self.assertEqual(raw["approved_plan"], file_sha256(t.dir / "plan.md"))
         self.assertEqual(t.prove(FakeDevice(), by_build(proof=fails_at(4)))["verdict"], "proven")
 
+    def test_bug_list_changes_after_approval_need_a_human(self):
+        t = TaskDir()
+        raw = json.loads(t.path.read_text())
+        moved_expect = [dict(raw["bugs"][0], expect="C3"), raw["bugs"][1]]
+        held_to_proof = [raw["bugs"][0], dict(raw["bugs"][1], role="proof", expect="C3")]
+        for change in (moved_expect, held_to_proof):
+            moved = dict(raw, bugs=change)
+            t.path.write_text(json.dumps(moved))
+            rec = t.prove(FakeDevice())
+            self.assertEqual(rec["verdict"], "needs_human", change)
+            self.assertIn("bugs changed since approval", rec["reason"])
+
+    def test_rebuilt_bug_apk_keeps_the_approval(self):
+        t = TaskDir()
+        (t.dir / "bug-proof-v2.apk").write_text("apk2")
+        raw = json.loads(t.path.read_text())
+        raw["bugs"][0]["apk"] = "bug-proof-v2.apk"
+        t.path.write_text(json.dumps(raw))
+        self.assertIsNone(load_task(t.path).approval_problem({"C1", "C2", "C3"}))
+
+    def test_approval_without_bug_binding_needs_a_human(self):
+        rec = TaskDir(approved_bugs=None).prove(FakeDevice())
+        self.assertIn("does not cover the bug list", rec["reason"])
+
     def test_approve_names_a_probe_id_without_a_digit(self):
         steps = [{"flow": "flow.yaml"}, {"probe": {"checkpoint": "S", "expect": "quiet"}}]
         t = TaskDir(steps=steps, approved_plan=None)
@@ -359,6 +385,72 @@ class FlowPolicy(unittest.TestCase):
             self.assertTrue(check_flow(parse_flow(p), "com.example.app", frozenset({"My garden"})).ok)
             self.assertFalse(check_flow(parse_flow(p), "com.example.app").ok)
             p.write_text(fixed)
+            self.assertTrue(check_flow(parse_flow(p), "com.example.app").ok)
+
+
+class VacuousAndFix(unittest.TestCase):
+    HEAD = 'appId: com.example.app\n---\n- launchApp:\n    stopApp: false\n- tapOn: "Garden"\n'
+
+    def check(self, text, anchors=frozenset()):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "f.yaml"
+            p.write_text(text)
+            return check_flow(parse_flow(p), "com.example.app", anchors)
+
+    def test_checkpoint_repeating_an_anchor_wait_is_vacuous(self):
+        flow = (self.HEAD + '- extendedWaitUntil:\n    visible: "My garden"\n    timeout: 5000\n'
+                '# checkpoint: C1 garden shown\n- assertVisible: "My garden"\n')
+        r = self.check(flow, frozenset({"My garden"}))
+        self.assertFalse(r.ok)
+        self.assertIn("checkpoint C1 only repeats", r.errors[0])
+
+    def test_two_checkpoints_on_the_same_text_with_no_action(self):
+        flow = self.HEAD + '# checkpoint: C1 a\n- assertVisible: "Avocado"\n# checkpoint: C2 b\n- assertVisible: "Avocado"\n'
+        self.assertIn("checkpoint C2 only repeats", " ".join(self.check(flow).errors))
+
+    def test_new_text_or_an_action_in_between_is_fine(self):
+        ok1 = self.HEAD + '# checkpoint: C1 a\n- assertVisible: "Avocado"\n- tapOn: "Avocado"\n# checkpoint: C2 b\n- assertVisible: "Avocado"\n'
+        ok2 = self.HEAD + '# checkpoint: C1 a\n- assertVisible: "Avocado"\n# checkpoint: C2 b\n- assertVisible: "Avocado"\n- assertVisible: "Planted"\n'
+        self.assertTrue(self.check(ok1).ok, self.check(ok1).errors)
+        self.assertTrue(self.check(ok2).ok, self.check(ok2).errors)
+        self.assertTrue(self.check(FLOW).ok)
+
+    def test_fix_moves_the_marker_and_repairs_launchapp(self):
+        round1 = ('appId: com.example.app\n---\n- launchApp\n- tapOn: "Garden"\n'
+                  '- extendedWaitUntil:\n    visible: "Avocado"\n    timeout: 5000\n'
+                  '# checkpoint: C1 plant listed\n- assertVisible: "Avocado"\n')
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "f.yaml"
+            p.write_text(round1)
+            self.assertFalse(check_flow(parse_flow(p), "com.example.app").ok)
+            fixes = fix_flow(p)
+            self.assertEqual(len(fixes), 2, fixes)
+            r = check_flow(parse_flow(p), "com.example.app")
+            self.assertTrue(r.ok, r.errors)
+            text = p.read_text()
+            self.assertLess(text.index("# checkpoint: C1"), text.index("extendedWaitUntil"))
+            self.assertIn("stopApp: false", text)
+            self.assertEqual(fix_flow(p), [])  # idempotent
+
+    def test_fix_leaves_anchor_waits_and_clean_flows_alone(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "f.yaml"
+            p.write_text(FLOW)
+            self.assertEqual(fix_flow(p), [])
+            self.assertEqual(p.read_text(), FLOW)
+            gated = (self.HEAD + '- extendedWaitUntil:\n    visible: "My garden"\n    timeout: 5000\n'
+                     '# checkpoint: C1 plant\n- assertVisible: "Avocado"\n')
+            p.write_text(gated)
+            self.assertEqual(fix_flow(p, frozenset({"My garden"})), [])
+
+    def test_fix_drops_clear_state_and_flips_stop_app(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "f.yaml"
+            p.write_text('appId: com.example.app\n---\n- launchApp:\n    clearState: true\n    stopApp: true\n'
+                         '# checkpoint: C1 a\n- assertVisible: "X"\n')
+            fixes = fix_flow(p)
+            self.assertEqual(sorted(fixes), sorted(["removed launchApp clearState: true (the runner resets app data)",
+                                                    "changed launchApp stopApp: true to false"]))
             self.assertTrue(check_flow(parse_flow(p), "com.example.app").ok)
 
 

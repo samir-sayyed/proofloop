@@ -167,18 +167,120 @@ def check_flow(flow: Flow, app_id: str, anchors: frozenset[str] = frozenset()) -
                             f"move the '# checkpoint: {cmds[j].checkpoint}' marker above it (a bug that breaks this "
                             "state would fail at setup and not count), or, if it waits for text that is always on "
                             "that screen, list the text as an anchor in the app map")
+    r.errors += _vacuous_checkpoints(flow)
     return r
+
+
+def fix_flow(path: Path, anchors: frozenset[str] = frozenset()) -> list[str]:
+    """Apply the fixes that have exactly one right answer, in place; return what changed.
+
+    - launchApp: add stopApp: false, turn stopApp: true into false, drop clearState: true (the runner resets).
+    - a wait or assertion right before a checkpoint, outside it: move the marker above that run.
+    Everything else (blocked commands, missing assertions) needs judgment and is left to the author.
+    """
+    path = Path(path)
+    fixes: list[str] = []
+    original = path.read_text()
+    lines = original.splitlines()
+    out: list[str] = []
+    i = 0
+    while i < len(lines):  # launchApp blocks
+        line = lines[i]
+        m = re.match(r"^- launchApp(:?)\s*(.*)$", line)
+        if not m:
+            out.append(line); i += 1
+            continue
+        body = [line]
+        i += 1
+        while i < len(lines) and lines[i].startswith((" ", "\t")):
+            body.append(lines[i]); i += 1
+        if not m.group(1) or m.group(2):  # scalar form: "- launchApp" or "- launchApp: com.x"
+            body = ["- launchApp:"] + ([f"    appId: {m.group(2)}"] if m.group(2) else [])
+        kept = [b for b in body if not re.match(r"\s*clearState:\s*true", b)]
+        if len(kept) != len(body):
+            fixes.append("removed launchApp clearState: true (the runner resets app data)")
+        if any(re.search(r"stopApp:\s*true", b) for b in kept):
+            fixes.append("changed launchApp stopApp: true to false")
+        body = [re.sub(r"stopApp:\s*true", "stopApp: false", b) for b in kept]
+        if not any(re.match(r"\s*stopApp:\s*false", b) for b in body):
+            body.append("    stopApp: false")
+            fixes.append("added stopApp: false to launchApp")
+        out += body
+    lines = out
+
+    for _ in range(50):  # move markers one at a time, re-parsing after each
+        path.write_text("\n".join(lines) + "\n")
+        flow = parse_flow(path)
+        cmds, moved = flow.commands, False
+        for i, c in enumerate(cmds):
+            if not c.checkpoint or (i and cmds[i - 1].checkpoint == c.checkpoint):
+                continue
+            j = i
+            while j > 0 and not cmds[j - 1].checkpoint and cmds[j - 1].name in ASSERTIONS:
+                texts = re.findall(r'"([^"]+)"', cmds[j - 1].body)
+                if texts and all(t in anchors for t in texts):
+                    break  # anchor waits are setup and may stay above the marker
+                j -= 1
+            if j == i:
+                continue
+            marker = next(n for n in range(c.line - 2, -1, -1)
+                          if (mm := CHECKPOINT_RE.match(lines[n].strip())) and mm.group(1) == c.checkpoint)
+            text = lines.pop(marker)
+            lines.insert(cmds[j].line - 1, text)
+            fixes.append(f"moved '# checkpoint: {c.checkpoint}' above the wait that gates it (line {cmds[j].line})")
+            moved = True
+            break
+        if not moved:
+            break
+    path.write_text("\n".join(lines) + "\n" if fixes else original)
+    return fixes
+
+
+def _vacuous_checkpoints(flow: Flow) -> list[str]:
+    """A checkpoint whose assertions only repeat text already checked, with no action in between, cannot
+    fail once the earlier check passed: it adds nothing a bug could trip. Typical case: an anchor wait
+    (allowed before a checkpoint) followed by a checkpoint asserting the same anchor."""
+    errors = []
+    seen: dict[str, str | None] = {}  # text -> checkpoint (or None for setup) that checked it since the last action
+    group, texts, prior = None, [], {}
+
+    def close():
+        if group and texts and all(t in prior and prior[t] != group for t in texts):
+            errors.append(f"{flow.path.name}: checkpoint {group} only repeats {', '.join(repr(t) for t in texts)}, "
+                          "already checked with no action in between; it cannot fail. Assert something the step "
+                          "under test changes")
+
+    for c in flow.commands:
+        if c.name not in ASSERTIONS:
+            close()
+            group, texts, seen = None, [], {}
+            continue
+        if c.checkpoint != group:
+            close()
+            group, texts, prior = c.checkpoint, [], dict(seen)
+        q = re.findall(r'"([^"]+)"', c.body)
+        if c.checkpoint:
+            texts += q
+        for t in q:
+            seen.setdefault(t, c.checkpoint)
+    close()
+    return errors
+
+
+def task_anchors(task) -> frozenset[str]:
+    """Screen anchors from tasks/<app>/app-map.md, if the app has a map."""
+    map_path = task.dir.parent / "app-map.md"
+    if not map_path.exists():
+        return frozenset()
+    from .appmap import load
+    return frozenset(a for s in load(map_path).screens.values() for a in s.anchors)
 
 
 def check_task_flows(task) -> tuple[CheckResult, dict[str, Flow]]:
     """Check every flow in a task, and that each expected checkpoint exists somewhere."""
     total = CheckResult()
     flows: dict[str, Flow] = {}
-    anchors: frozenset[str] = frozenset()
-    map_path = task.dir.parent / "app-map.md"  # tasks/<app>/app-map.md
-    if map_path.exists():
-        from .appmap import load
-        anchors = frozenset(a for s in load(map_path).screens.values() for a in s.anchors)
+    anchors = task_anchors(task)
     for p in task.flow_paths():
         f = parse_flow(p)
         flows[str(p)] = f

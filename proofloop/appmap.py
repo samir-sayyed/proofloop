@@ -136,6 +136,19 @@ def check(m: AppMap) -> list[str]:
     return errs
 
 
+def ambiguous_anchors(m: AppMap) -> dict[tuple[str, str], list[str]]:
+    """Anchors that are also visible on another screen: another screen lists them as an anchor, or
+    taps them (a tab label). Seeing such text does not identify the screen. {(screen, anchor): others}"""
+    out = {}
+    for s in m.screens.values():
+        for a in s.anchors:
+            others = [t.id for t in m.screens.values() if t is not s
+                      and (a in t.anchors or any(e.locator == a for e in t.edges))]
+            if others:
+                out[(s.id, a)] = others
+    return out
+
+
 def unreachable(m: AppMap) -> list[str]:
     """Screens no edge leads to from the first screen (the launch screen)."""
     if not m.screens:

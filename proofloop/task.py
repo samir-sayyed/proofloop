@@ -58,6 +58,13 @@ def file_sha256(path) -> str | None:
         return None
 
 
+def bugs_digest(bugs) -> str:
+    """sha256 over (name, role, expect) of every bug, order-independent. APK paths are not part of it:
+    rebuilding a bug changes its file, not what the human approved it to prove."""
+    rows = sorted([b[0], b[1], b[2]] for b in bugs)
+    return "sha256:" + hashlib.sha256(json.dumps(rows).encode()).hexdigest()
+
+
 def plan_ids(text: str, declared: set[str] = frozenset()) -> set[str]:
     """Checkpoint ids a plan lists: a bullet's first word, if it has a digit (C1) or is a declared id (S).
 
@@ -102,6 +109,8 @@ class Task:
     repairs: list[dict] = field(default_factory=list)
     approved_by: str | None = None  # human approval of the checkpoint plan; prove refuses without it
     approved_plan: str | None = None  # sha256 of plan.md when it was approved (set by `proofloop approve`)
+    approved_bugs: str | None = None  # sha256 of the bug list (name, role, expect) at approval
+    author: dict = field(default_factory=dict)  # who wrote the flows: {"agent", "model", "session"}
 
     @property
     def dir(self) -> Path:
@@ -122,6 +131,11 @@ class Task:
             return "plan.md is missing; the approval has nothing to cover"
         if actual != self.approved_plan:
             return "plan.md changed since it was approved; a human must review it and approve again"
+        if not self.approved_bugs:
+            return "the approval does not cover the bug list (approve again: proofloop approve TASK --by NAME)"
+        if bugs_digest([(b.name, b.role, b.expect) for b in self.bugs]) != self.approved_bugs:
+            return ("the bugs changed since approval (a name, role or expected checkpoint); "
+                    "a human must approve again")
         planned = plan_ids(self.plan_path.read_text(), declared)
         extra, missing = sorted(declared - planned), sorted(planned - declared)
         if extra or missing:
@@ -217,6 +231,8 @@ def load_task(path: str | Path) -> Task:
         repairs=list(raw.get("repairs", [])),
         approved_by=raw.get("approved_by"),
         approved_plan=raw.get("approved_plan"),
+        approved_bugs=raw.get("approved_bugs"),
+        author=dict(raw.get("author", {})),
     )
 
 
@@ -240,7 +256,10 @@ def approve(task_path: str | Path, by: str, today: str) -> str:
     ids = plan_ids(plan.read_text(), declared)
     if not ids:
         raise TaskError("plan.md lists no checkpoints (lines like '- C1 the wizard opens')")
+    bugs = [(b["name"], b.get("role", "proof"), b.get("expect")) for b in raw.get("bugs", [])]
     raw["approved_by"] = f"{by}, {today}"
     raw["approved_plan"] = digest
+    raw["approved_bugs"] = bugs_digest(bugs)
     task_path.write_text(json.dumps(raw, indent=2, ensure_ascii=False) + "\n")
-    return f"approved plan.md ({', '.join(sorted(ids))}; {digest[:19]}) by {by}"
+    proof = ", ".join(f"{n}@{e}" for n, r, e in bugs if r == "proof") or "none"
+    return f"approved plan.md ({', '.join(sorted(ids))}; {digest[:19]}) and proof bugs ({proof}) by {by}"

@@ -30,7 +30,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from .appmap import load as load_map
+from .appmap import ambiguous_anchors, load as load_map
 
 IMPLICIT = {"defineVariablesCommand", "applyConfigurationCommand"}
 
@@ -88,11 +88,10 @@ class Memory:
         self.path = self.dir / "app-memory.json"
         m = load_map(self.dir / "app-map.md")
         self.app = m.app
-        owners: dict[str, list[str]] = {}
-        for s in m.screens.values():
-            for a in s.anchors:
-                owners.setdefault(a, []).append(s.id)
-        self.anchor_screen = {a: ids[0] for a, ids in owners.items() if len(ids) == 1}  # ambiguous anchors skipped
+        # Only anchors visible on exactly one screen identify it. Text another screen also lists or taps
+        # (a tab label such as "My garden") would record wrong edges, and re-observation "confirms" them.
+        shared = {a for (_, a) in ambiguous_anchors(m)}
+        self.anchor_screen = {a: s.id for s in m.screens.values() for a in s.anchors if a not in shared}
         data = json.loads(self.path.read_text()) if self.path.exists() else {}
         self.sources: list[dict] = data.get("sources", [])
         self.facts: dict[str, dict] = data.get("facts", {})
