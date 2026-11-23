@@ -1,6 +1,6 @@
 #!/bin/zsh
 # Build the Quiet Hours good APK and one APK per seeded bug from a base commit, without committing anything.
-# Usage: build-apks.sh [APP_REPO] [BASE] [OUT_DIR]
+# Usage: [NO_BUGS=1] build-apks.sh [APP_REPO] [BASE] [OUT_DIR]
 # The app repo must have no uncommitted changes to tracked files under app/ (other edits are stashed and restored).
 set -e
 REPO=${1:-~/Desktop/quiet-hours}; BASE=${2:-e4ba3eb}; OUT=${3:-${0:A:h}/../../.scratch/proofloop/apks}
@@ -13,4 +13,5 @@ trap restore EXIT
 git switch -q --detach $BASE
 build() { ./gradlew -q assembleDebug >/dev/null 2>&1 && cp app/build/outputs/apk/debug/app-debug.apk $OUT/$1.apk && echo "built $1 from $BASE"; }
 build good-$BASE
+[[ -n "$NO_BUGS" ]] && exit 0  # NO_BUGS=1: just this commit (e.g. a fix and its parent, for proofloop from-fix)
 for p in $BUGS/*.patch; do n=${p:t:r}; git apply $p && build $n-$BASE; git checkout -q -- app; done

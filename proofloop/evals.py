@@ -25,7 +25,10 @@ def run_eval(root: Path, device, maestro, out: Path, good_runs: int | None = Non
         if good_runs:
             task.good_runs = good_runs
         rec = prove(task, device, maestro, out / task.name.replace("/", "-"), **prove_kw)
-        (out / f"{task.name.replace('/', '-')}.record.json").write_text(json.dumps(rec, indent=2))
+        rp = out / f"{task.name.replace('/', '-')}.record.json"
+        rp.write_text(json.dumps(rec, indent=2))
+        from .history import append
+        append(task, rec, rp)
         records.append(rec)
     return records
 

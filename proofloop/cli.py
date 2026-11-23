@@ -12,6 +12,11 @@
   proofloop map    MAP [FLOWS...]  check an app map; with flow files or dirs, report screens/actions no flow covers
   proofloop try    TASK            run the task once on the good build, keep the attempt, learn from it
   proofloop learn  APP_DIR [...]   learn app memory from proofs, attempts or imported Maestro runs
+  proofloop history TASK           proof history and shelf life of the task's test
+  proofloop mine-bugs REPO [--task T]  fix commits whose parent is a real held-out bug
+  proofloop retro  PATHS...        group rejected proofs by cause, with the rule or step for each
+  proofloop next   APP_DIR         backfill queue: what no flow covers yet, rules first
+  proofloop from-fix REPO SHA --app-dir D --name N   regression-test task from a real fix
 
 Exit codes: 0 proven / ok, 1 not proven, 2 usage or setup error.
 """
@@ -95,6 +100,9 @@ def cmd_prove(args) -> int:
     (out / "report.md").write_text(render(record))
     print(render(record))
     print(f"record: {out / 'record.json'}")
+    from . import history
+    history.append(task, record, out / "record.json")
+    print(f"history: {history.summary(history.load(task.dir))}")
     app = _app_dir(task)
     if app and args.learn:
         try:
@@ -102,6 +110,52 @@ def cmd_prove(args) -> int:
         except Exception as e:  # learning never changes a verdict
             print(f"memory not updated: {e}")
     return 0 if record["verdict"] == "proven" else 1
+
+
+def cmd_history(args) -> int:
+    from . import history
+    task = load_task(args.task)
+    rows = history.load(task.dir)
+    for r in rows:
+        print(f"{r['date']}  {r['verdict']:<20} good {r['good']}  flows {r['flows']}  runs {r['good_runs']}/{r['required']}")
+    print(history.summary(rows))
+    return 0
+
+
+def cmd_mine(args) -> int:
+    from .mine import fix_commits
+    crit = load_task(args.task).criterion if args.task else ""
+    rows = fix_commits(Path(args.repo), crit, limit=args.limit, since=args.since)
+    for c in rows:
+        on = f" on topic: {', '.join(c['overlap'])}" if c["overlap"] else ""
+        print(f"{c['sha']}  parent {c['parent']}  {c['date']}  {c['files']} files  score {c['score']:>5}  {c['subject']}{on}")
+    print(f"{len(rows)} candidates. Build the parent of a fix as a held_out bug "
+          f"(e.g. tasks/quiet-hours/build-apks.sh REPO PARENT) and prove: does the test catch a real regression?")
+    return 0
+
+
+def cmd_next(args) -> int:
+    from .factory import backlog
+    items = backlog(Path(args.app_dir))
+    for i in items[:args.limit]:
+        print(f"[{i['kind']:<6}] {i['criterion']}")
+    print(f"{len(items)} untested items in {args.app_dir} (showing {min(len(items), args.limit)}). "
+          "Pick one, write plan.md, get it approved, then prove.")
+    return 0
+
+
+def cmd_from_fix(args) -> int:
+    from .factory import from_fix
+    d = from_fix(Path(args.repo), args.sha, Path(args.app_dir), args.name)
+    print(f"scaffolded {d}: task.json (good = the fix, proof bug = its parent) and a draft plan.md")
+    print("next: build both APKs, write the checkpoints and flow, set the bug's expect, approve, prove")
+    return 0
+
+
+def cmd_retro(args) -> int:
+    from .retro import retro
+    print(retro(args.paths), end="")
+    return 0
 
 
 def cmd_report(args) -> int:
@@ -307,6 +361,18 @@ def main(argv=None) -> int:
     s.add_argument("--current-build", help="the app's current good build, for staleness (default: build of the latest run)")
     s.set_defaults(fn=cmd_learn)
     s = sub.add_parser("report"); s.add_argument("record"); s.set_defaults(fn=cmd_report)
+    s = sub.add_parser("history", help="proof history and shelf life of a task's test")
+    s.add_argument("task"); s.set_defaults(fn=cmd_history)
+    s = sub.add_parser("mine-bugs", help="list fix commits whose parent can serve as a real held-out bug")
+    s.add_argument("repo"); s.add_argument("--task", help="rank by overlap with this task's criterion")
+    s.add_argument("--limit", type=int, default=15); s.add_argument("--since"); s.set_defaults(fn=cmd_mine)
+    s = sub.add_parser("retro", help="group rejected proofs by cause and name the rule or step for each")
+    s.add_argument("paths", nargs="+"); s.set_defaults(fn=cmd_retro)
+    s = sub.add_parser("next", help="backfill queue: app-map rules, screens and actions no flow covers yet")
+    s.add_argument("app_dir"); s.add_argument("--limit", type=int, default=15); s.set_defaults(fn=cmd_next)
+    s = sub.add_parser("from-fix", help="scaffold a regression-test task from a fix commit (good = fix, bug = parent)")
+    s.add_argument("repo"); s.add_argument("sha"); s.add_argument("--app-dir", required=True)
+    s.add_argument("--name", required=True); s.set_defaults(fn=cmd_from_fix)
     s = sub.add_parser("publish"); s.add_argument("record"); s.add_argument("--repo", required=True)
     s.add_argument("--push", action="store_true", help="push and open a PR with gh")
     s.add_argument("--with-video", action="store_true", help="commit the recording of good run 1 next to the flow")
