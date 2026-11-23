@@ -149,12 +149,17 @@ minutes. Use `--runs 3` for a fast provisional sweep. The task files point at AP
 
 | Command | What it does |
 |---|---|
-| `proofloop check TASK` | Check the task's flows (allowlist, checkpoints, coordinate fallbacks). No device needed. Also prints whether the approval covers the current plan (a warning only; `prove` enforces it). |
-| `proofloop approve TASK --by NAME` | Run by the human who reviewed `plan.md`: writes `approved_by` and `approved_plan` (the plan's sha256) into `task.json`. |
-| `proofloop prove TASK [--out D] [--runs N] [--fail-fast]` | Run the proof and write the run record and report. `--runs` overrides `good_runs`; `--fail-fast` stops the good runs at the first failure. |
+| `proofloop check TASK [--fix]` | Check the task's flows (allowlist, checkpoints, coordinate fallbacks). No device needed. Also prints whether the approval covers the current plan (a warning only; `prove` enforces it). `--fix` first applies the fixes that have one right answer: `launchApp` options, and a marker moved above the wait that gates it. |
+| `proofloop approve TASK --by NAME` | Run by the human who reviewed `plan.md` and the bug list: writes `approved_by`, `approved_plan` (the plan's sha256) and `approved_bugs` (each bug's name, role and expected checkpoint) into `task.json`. |
+| `proofloop prove TASK [--out D] [--runs N] [--fail-fast] [--devices A,B] [--snapshot S] [--no-video]` | Run the proof and write the run record and report, and append a line to the task's `proof-history.jsonl`. `--runs` overrides `good_runs`; `--fail-fast` stops the good runs at the first failure; `--devices` spreads good runs 2..N over more devices in parallel (bug builds stay on the main device); `--snapshot` loads an emulator snapshot on every device first (not on `-read-only` emulators, which boot from it instead). Good run 1 is screen-recorded unless `--no-video`. |
 | `proofloop report RECORD` | Print the markdown report for a run record. |
-| `proofloop publish RECORD --repo APP_REPO [--push]` | Commit a **proven** test to the app repo on a `proofloop/<slug>` branch; `--push` also pushes and opens a PR with `gh`. Refuses unproven records, records without artifact hashes, and any flow edited since its proof. Never merges. |
-| `proofloop eval DIR [--config NAME] [--runs N] [--out D]` | Prove every task under DIR and print the results table. |
+| `proofloop publish RECORD --repo APP_REPO [--push] [--with-video] [--max-open N]` | Commit a **proven** test to the app repo on a `proofloop/<slug>` branch; `--push` also pushes and opens a PR with `gh`, but not while `--max-open` (default 3) proofloop PRs wait for review. `--with-video` commits the recording of good run 1. Refuses unproven records, records without artifact hashes, and any flow edited since its proof. Never merges. |
+| `proofloop eval DIR [--config NAME] [--runs N] [--out D] [--devices A,B] [--snapshot S]` | Prove every task under DIR and print the results table: verdicts, catches, repairs, author and author tokens. |
+| `proofloop history TASK` | Every proof of the task's test, and its shelf life: on how many good builds it stayed proven, and the first one it stopped on. |
+| `proofloop mine-bugs APP_REPO [--task T] [--since DATE]` | Fix commits that touch app source, ranked by size and overlap with the task's criterion. The parent of a fix is a real bug build to use as a held-out bug. |
+| `proofloop retro PATHS...` | Group rejected records by cause, with the checker rule or step that addresses each, so a recurring mistake becomes a rule. |
+| `proofloop next APP_DIR` | Backfill queue: app-map rules, screens and actions no flow covers yet, rules first. |
+| `proofloop from-fix APP_REPO SHA --app-dir D --name N` | Scaffold a regression-test task from a fix commit: good build is the fix, proof bug is its parent, `plan.md` seeded with the commit message. Never approved by the scaffold. |
 | `proofloop prepare TASK` | Put the device in the task's start state for exploring (good build, clean data, grants, pinned clock). |
 | `proofloop restore-clock` | Restore automatic time and time zone. |
 | `proofloop probe` | Print the device's sound state (read-only). |
@@ -195,7 +200,8 @@ A task is a JSON file plus its flows. Paths inside it are relative to the file. 
 
 | Field | Meaning |
 |---|---|
-| `approved_by`, `approved_plan` | Who approved the checkpoint plan, and the sha256 of `plan.md` they approved. Both are written by `proofloop approve`. **`prove` returns `needs_human`** if either is missing, if `plan.md` changed since approval, or if the checkpoint ids in the flows and probes differ from the plan's. |
+| `approved_by`, `approved_plan`, `approved_bugs` | Who approved, the sha256 of `plan.md`, and a sha256 over every bug's name, role and expected checkpoint. All three are written by `proofloop approve`. **`prove` returns `needs_human`** if one is missing, if `plan.md` or the bug list changed since approval, or if the checkpoint ids in the flows and probes differ from the plan's. Rebuilding a bug's APK does not invalidate the approval. |
+| `author` | Optional: `{"agent", "model", "session"}` of whoever wrote the flows. With a Claude Code session or subagent id, `prove` adds its token usage from the local transcript to the record. |
 | `good` | The good build. |
 | `bugs[].role` | `proof`: must fail at `expect` (a checkpoint id declared in a flow or probe). `held_out`: run after the verdict, never changes it. At least one proof bug is required. |
 | `device` | Time zone and pinned clock (needed for time-dependent checks), runtime permissions to grant, and `dnd_access` for apps that change do-not-disturb. |
@@ -250,6 +256,8 @@ is `setup`; a failing tap is an `action` failure. Neither counts as catching a b
 - **No wait or assertion right before a checkpoint, outside it.** Put the marker above the wait that gates the
   assertion: a bug that breaks that state would otherwise fail at setup and not count. Waits on a screen anchor
   listed in the app map are allowed.
+- **A checkpoint must be able to fail.** One whose assertions only repeat text already checked, with no action in
+  between, is rejected (typically an anchor wait followed by a checkpoint on the same anchor).
 - **Coordinate taps (`point:`) are flagged** as fallbacks in the report, not blocked.
 - Prefer `id:` and text locators, and wait on visible state with `extendedWaitUntil`, never fixed sleeps.
 - Multi-line text in one element needs a regex that continues past the first line, for example
@@ -283,6 +291,10 @@ proofloop map tasks/sunflower/app-map.md tasks/sunflower
 checks the format, flags screens nothing leads to, and lists screens and actions no flow touches (text
 matching, not execution). Maps of both sample apps: [Sunflower](tasks/sunflower/app-map.md),
 [Quiet Hours](tasks/quiet-hours/app-map.md). Maps hold facts about the good build only, never bug details.
+
+`proofloop map` warns about anchors that are also visible on another screen (another screen's anchor, or a tab
+label it taps). Such text cannot identify a screen, so the learner ignores it. Sunflower's two tab labels are
+this case, and its garden screen has no text that is both always there and unique to it.
 
 ### Self-learning memory
 

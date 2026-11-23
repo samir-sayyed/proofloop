@@ -268,12 +268,20 @@ def _vacuous_checkpoints(flow: Flow) -> list[str]:
 
 
 def task_anchors(task) -> frozenset[str]:
-    """Screen anchors from tasks/<app>/app-map.md, if the app has a map."""
+    """Screen anchors from tasks/<app>/app-map.md that may exempt a wait from the checkpoint rule.
+
+    Only anchors unique to one screen count: a wait on a tab label visible on two screens says nothing
+    about where the app is (a one-shot author waited on Sunflower's "Plant list" tab right before C1).
+    """
     map_path = task.dir.parent / "app-map.md"
-    if not map_path.exists():
-        return frozenset()
-    from .appmap import load
-    return frozenset(a for s in load(map_path).screens.values() for a in s.anchors)
+    return map_anchors(map_path) if map_path.exists() else frozenset()
+
+
+def map_anchors(map_path) -> frozenset[str]:
+    from .appmap import ambiguous_anchors, load
+    m = load(map_path)
+    shared = {a for (_, a) in ambiguous_anchors(m)}
+    return frozenset(a for s in m.screens.values() for a in s.anchors if a not in shared)
 
 
 def check_task_flows(task) -> tuple[CheckResult, dict[str, Flow]]:

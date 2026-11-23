@@ -48,6 +48,13 @@ class AppMapTest(unittest.TestCase):
         amb = ambiguous_anchors(load(Path(__file__).parent.parent / "tasks" / "sunflower" / "app-map.md"))
         self.assertIn(("garden", "My garden"), amb)  # the anchor that recorded a wrong edge (ADR 0004)
 
+    def test_shared_anchors_do_not_exempt_waits(self):
+        from proofloop.flow import map_anchors
+        anchors = map_anchors(Path(__file__).parent.parent / "tasks" / "sunflower" / "app-map.md")
+        self.assertNotIn("Plant list", anchors)  # a tab on two screens
+        self.assertNotIn("My garden", anchors)
+        self.assertIn("Watering needs", anchors)
+
     def test_errors(self):
         bad = GOOD.replace('-> editor', '-> nowhere').replace('- rule:', '- tip:') \
                   .replace('anchors: "Lost"', '').replace('1. home:', '1. attic:')

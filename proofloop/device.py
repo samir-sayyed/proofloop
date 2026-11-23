@@ -142,6 +142,9 @@ class AdbDevice:
             raise DeviceError(f"--snapshot needs an emulator; {self.serial} is not one")
         r = subprocess.run([self.adb, "-s", self.serial, "emu", "avd", "snapshot", "load", name],
                            capture_output=True, text=True, timeout=timeout_s)
+        if "read-only" in r.stdout:
+            raise DeviceError(f"{self.serial} runs with -read-only, which cannot load snapshots after boot; it "
+                              f"already started from its boot snapshot, so prove without --snapshot")
         if r.returncode != 0 or "KO" in r.stdout:
             raise DeviceError(f"loading snapshot {name} failed: {(r.stdout + r.stderr).strip()}")
         deadline = time.monotonic() + timeout_s
