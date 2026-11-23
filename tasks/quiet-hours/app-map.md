@@ -33,6 +33,7 @@ anchors: "Manage your sound profiles", "Add Schedule"
 - rule: each schedule card shows its title, day summary ("Weekdays"), "• 8h •" and a status line ("Next: Today 9:00 AM", "Active until 5:00 PM", "Next: Tomorrow 9:00 AM")
 - rule: the status line text is read from the app, never guessed ("Today", not the weekday name)
 - hazard: "Review battery limits on this device" banner is always there on the emulator; it is not an error
+- hazard: first visit shows a 4-step tip tour (bubbles on +, Templates, Meetings, Menu) with "Skip"/"Next"/"Got it"; the bubble is a focusable popup that eats the next tap, so tap "Skip" first. Wizard step 1 has its own 5-step tour (template, name, days, time, sound; "Skip" ends it), step 2 a one-time "Got it" on More options. Meetings setup (4 steps) and VIP Calls (turn on, then who/contacts once on) have tours too. Settings > "Show how to use the app" brings them all back. After the Home tour: a one-time bubble on the reliability card ("Got it"), and once a schedule exists, one on the first schedule card. Templates shows one on the first template
 - lookup: sound state is not on screen; the runner's probe steps read do-not-disturb and ring volume
 
 ## screen: wizard_details
