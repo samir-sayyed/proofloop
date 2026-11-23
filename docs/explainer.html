@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ProofLoop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: one reading column, wide pieces (flow, tables, charts) scroll inside their own box.
+   Voice: a lab notebook for a test gate: pass/fail colour is the only loud thing on the page. */
+:root {
+  --bg: #f4f7f6; --surface: #ffffff; --ink: #14211e; --muted: #56655f; --line: #d5dedb;
+  --accent: #0b6e6e; --accent-soft: #dcefee;
+  --pass: #1d7a4b; --pass-soft: #dff1e6; --fail: #b3362d; --fail-soft: #f8e1de; --warn: #8a5a00; --warn-soft: #f6ecd2;
+  --code-bg: #eaf0ee;
+  --head: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1715; --surface: #15211e; --ink: #e6efec; --muted: #9bb0a9; --line: #2a3a36;
+  --accent: #5cc8c4; --accent-soft: #17302f;
+  --pass: #5fd08f; --pass-soft: #14301f; --fail: #ff8a7d; --fail-soft: #3a1a17; --warn: #e6b450; --warn-soft: #33290f;
+  --code-bg: #1a2a27; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0e1715; --surface: #15211e; --ink: #e6efec; --muted: #9bb0a9; --line: #2a3a36;
+  --accent: #5cc8c4; --accent-soft: #17302f;
+  --pass: #5fd08f; --pass-soft: #14301f; --fail: #ff8a7d; --fail-soft: #3a1a17; --warn: #e6b450; --warn-soft: #33290f;
+  --code-bg: #1a2a27; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--body); margin: 0;
+  padding-block: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 800px; margin: 0 auto; }
+header.top { padding-block: 56px 28px; }
+.kicker { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(34px, 7vw, 56px)/1.05 var(--head); letter-spacing: -.02em; margin: 14px 0 16px; text-wrap: balance; }
+h2 { font: 700 clamp(24px, 4vw, 30px)/1.2 var(--head); letter-spacing: -.01em; margin: 0 0 10px; text-wrap: balance; }
+h3 { font: 600 17px/1.3 var(--head); margin: 22px 0 6px; }
+p { margin: 0 0 14px; max-width: 66ch; }
+.lead { font-size: 19px; color: var(--ink); max-width: 60ch; }
+section { padding-block: 40px; border-top: 1px solid var(--line); }
+.muted { color: var(--muted); }
+a { color: var(--accent); }
+code, pre { font-family: var(--mono); font-size: 13.5px; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto; margin: 12px 0 18px; line-height: 1.55; }
+pre code { background: none; padding: 0; }
+.scroll { overflow-x: auto; margin: 12px 0 18px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 520px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 12px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font: 500 12px/1 var(--mono); padding: 4px 8px; border-radius: 99px; white-space: nowrap; }
+.pill.pass { background: var(--pass-soft); color: var(--pass); }
+.pill.fail { background: var(--fail-soft); color: var(--fail); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.info { background: var(--accent-soft); color: var(--accent); }
+.proof { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 22px 0; }
+.proof .row { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; padding-block: 8px; }
+.proof .row + .row { border-top: 1px dashed var(--line); }
+.proof .label { font: 500 13px/1.3 var(--mono); color: var(--muted); }
+.cells { display: flex; gap: 4px; flex-wrap: wrap; }
+.cell { width: 22px; height: 22px; border-radius: 5px; background: var(--pass); }
+.cell.bad { background: var(--fail); }
+.cell.gap { background: var(--line); }
+.cp { display: flex; gap: 4px; flex-wrap: wrap; }
+.cp span { font: 500 12px/1 var(--mono); padding: 7px 9px; border-radius: 6px; background: var(--pass-soft); color: var(--pass); }
+.cp span.x { background: var(--fail-soft); color: var(--fail); }
+.cp span.n { background: var(--line); color: var(--muted); }
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 18px 0; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 14.5px; }
+.step b { display: block; font: 600 15px/1.3 var(--head); margin-bottom: 4px; }
+.step .who { display: inline-block; font: 500 11px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; margin-bottom: 8px; }
+.who.agent { background: var(--accent-soft); color: var(--accent); }
+.who.runner { background: var(--code-bg); color: var(--ink); }
+.who.human { background: var(--warn-soft); color: var(--warn); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.two > div { min-width: 0; }
+.bad-label, .good-label { font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+.bad-label { color: var(--fail); } .good-label { color: var(--pass); }
+.bars { margin: 14px 0 6px; }
+.bar { display: grid; grid-template-columns: 92px 1fr 52px; gap: 10px; align-items: center; margin: 6px 0; font-size: 14px; }
+.bar .track { height: 20px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--muted); }
+.bar .fill.map { background: var(--accent); }
+.bar .v { font: 500 13px/1 var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+.stats { display: flex; gap: 28px; flex-wrap: wrap; margin: 22px 0 4px; }
+.stat b { display: block; font: 700 34px/1 var(--head); letter-spacing: -.02em; }
+.stat span { font-size: 13px; color: var(--muted); }
+ul { padding-left: 20px; margin: 0 0 14px; max-width: 66ch; } li { margin: 4px 0; }
+footer { padding-block: 32px 64px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+@media (max-width: 560px) { .two { grid-template-columns: 1fr; } .proof .row { grid-template-columns: 1fr; gap: 6px; } .bar { grid-template-columns: 74px 1fr 46px; } }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="kicker">Android UI tests · written by agents · accepted by proof</div>
+  <h1>Would this test actually turn red if the feature broke?</h1>
+  <p class="lead">An AI agent can write an Android UI test in minutes. ProofLoop accepts the test only after it passes on every clean run of the good build and fails, at the expected step, on builds with the feature deliberately broken. Plain code gives the verdict. No model does.</p>
+  <div class="stats">
+    <div class="stat"><b>4 / 4</b><span>tasks proven, 2 apps</span></div>
+    <div class="stat"><b>8 / 8</b><span>seeded-bug checks caught</span></div>
+    <div class="stat"><b>0 / 40</b><span>good-build flakes</span></div>
+    <div class="stat"><b>6 / 6</b><span>new authors proven, incl. no-device</span></div>
+  </div>
+  <p class="muted" style="font-size:14px">Updated 2026-11-23: Quiet Hours tests re-proven on the app's newest build after it broke them, approvals bound to the plan and bugs, baselines measured.</p>
+</header>
+
+<section id="problem">
+  <h2>The problem</h2>
+  <p>A test that passes tells you little. The agent that wrote it also decides what "correct" looks like, so it can assert something too weak to ever fail, or lean on a wait that makes it pass for the wrong reason. A green run only shows the test did not fail <em>this time</em>.</p>
+  <p>The question that matters comes after: if someone breaks the feature, does this test go red, and at the step that tests the feature? ProofLoop asks that directly by breaking the feature on purpose and watching.</p>
+</section>
+
+<section id="gate">
+  <h2>The gate</h2>
+  <p>For one acceptance criterion, a flow is <strong>proven</strong> only when both hold:</p>
+  <div class="proof" role="group" aria-label="Example proof for one test">
+    <div class="row"><div class="label">Good build</div><div><div class="cells" aria-label="10 clean runs, all passed"><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i><i class="cell"></i></div><div class="muted" style="font-size:13.5px;margin-top:6px">10 clean runs from a reset app. All must pass.</div></div></div>
+    <div class="row"><div class="label">Bug: weekdays off by one</div><div><div class="cp" aria-label="Checkpoints C1, C2 passed, C3 failed"><span>C1</span><span>C2</span><span class="x">C3 failed</span><span class="n">C4</span></div><div class="muted" style="font-size:13.5px;margin-top:6px">Must fail at <b>C3</b>, the checkpoint that tests days. A crash or a failure elsewhere does not count.</div></div></div>
+  </div>
+  <p>The run order saves time on failures. The runner does one good run, then each proof bug, then the remaining nine good runs. A test that misses a proof bug is rejected after about two runs instead of eleven.</p>
+  <p>Bugs come in two roles. <strong>Proof</strong> bugs select the test. <strong>Held-out</strong> bugs run after the verdict and never change it; they measure whether the test also catches defects it was not tuned for.</p>
+  <h3>Why "at the expected step" matters</h3>
+  <p>Every flow carries checkpoint markers. A failure maps to the marker it happened under: <code>setup</code> before the first, a checkpoint, or <code>action</code> (a tap that failed). Only a failed assertion at the expected checkpoint counts as catching the bug. One seeded bug crashed the app at launch; the test "failed" and the gate refused to count it.</p>
+</section>
+
+<section id="how">
+  <h2>How it works</h2>
+  <p>Three parts. The agent does the creative work. The runner does everything that must be the same every time.</p>
+  <div class="flow">
+    <div class="step"><span class="who agent">agent · skill</span><b>1. Plan checkpoints</b>Turns the criterion into numbered, observable conditions.</div>
+    <div class="step"><span class="who human">human</span><b>2. Approve the plan</b><code>proofloop approve</code> hashes <code>plan.md</code> and the bug list. If either changes, or the flows' checkpoints differ from the plan, the runner refuses.</div>
+    <div class="step"><span class="who agent">agent · skill</span><b>3. Explore and write</b>Reads the app map, explores the good build with Maestro, writes the flow. Never sees the bug builds.</div>
+    <div class="step"><span class="who runner">runner</span><b>4. Check the flow</b>Command allowlist, checkpoint mapping, no waits hiding a checkpoint, no checkpoint that cannot fail. <code>--fix</code> repairs the mechanical errors.</div>
+    <div class="step"><span class="who runner">runner</span><b>5. Prove it</b>Resets the app, pins the clock, and runs the good build and each bug build. Good runs can spread over several emulators. Good run 1 is recorded on video.</div>
+    <div class="step"><span class="who runner">runner</span><b>6. Verdict and report</b>Seven possible verdicts. The record hashes every flow, plan and APK it used. Only <code>proven</code> can become a pull request, and only while the flow still matches its hash.</div>
+  </div>
+  <ul>
+    <li><strong>The proofloop skill</strong> guides Claude Code through the steps above and at most two evidence-based repairs.</li>
+    <li><strong>The runner</strong> is a Python standard-library program (<code>proofloop</code>): flow checker, app reset, clock and time-zone pinning, read-only sound probes, repeated runs, verdict, run record, report, publishing.</li>
+    <li><strong>The app-map skill</strong> explores an app once and records its screens, actions and rules, so the next session does not start from zero.</li>
+  </ul>
+  <h3>Why the runner owns device state</h3>
+  <p>The first proof was rejected as flaky twice. The cause was not the app: a data clear left a pending "remove task" that killed the freshly launched process 68 to 185 ms after it started. Moving reset into the runner, with a wait for the old task to go, gave 0 hangs in 40 launches. The runner also pins the clock (Maestro flows cannot) and reads sound state with probes (quiet or normal, from <code>dumpsys audio</code>, do-not-disturb and ring volume).</p>
+</section>
+
+<section id="example">
+  <h2>A worked example</h2>
+  <p>Criterion for Quiet Hours, a sound-scheduling app: <em>a Weekdays schedule appears on Home with its title, "Weekdays", and the correct next start.</em> The clock is pinned to Wednesday 18 Nov 2026, 08:00.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Checkpoint</th><th>What it asserts</th><th>Good build</th><th>Weekdays off by one</th><th>Next start skips today</th></tr></thead>
+    <tbody>
+      <tr><td>C1</td><td>The wizard opens from "Add Schedule"</td><td><span class="pill pass">pass</span></td><td><span class="pill pass">pass</span></td><td><span class="pill pass">pass</span></td></tr>
+      <tr><td>C2</td><td>The title is listed on Home</td><td><span class="pill pass">pass</span></td><td><span class="pill pass">pass</span></td><td><span class="pill pass">pass</span></td></tr>
+      <tr><td>C3</td><td>The day summary reads "Weekdays"</td><td><span class="pill pass">pass</span></td><td><span class="pill fail">fail</span></td><td><span class="pill pass">pass</span></td></tr>
+      <tr><td>C4</td><td>Status reads "Next: Today 9:00 AM"</td><td><span class="pill pass">pass</span></td><td class="muted">not reached</td><td><span class="pill fail">fail</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>The first bug (Tue to Sat instead of Mon to Fri) is the proof bug and is caught at C3. The second is held out and is caught at C4. Without the pinned clock, the held-out bug passed the test on a Saturday: the next start of a weekday schedule is Monday whether or not today is skipped.</p>
+  <p>The checkpoint markers are comments in an ordinary Maestro flow:</p>
+<pre><code># checkpoint: C3 the day summary reads "Weekdays"
+- assertVisible: "Weekdays"</code></pre>
+</section>
+
+<section id="trap">
+  <h2>What a fresh agent gets wrong</h2>
+  <p>Six fresh agent sessions each wrote a test for the same new criterion. All six passed the good build 3 of 3. None was proven. Every one put a wait for a plant name <em>above</em> the checkpoint marker. On the bug build the garden was empty, so the wait failed at <code>setup</code>, which the gate does not count.</p>
+  <div class="two">
+    <div><div class="bad-label">Wait above the marker</div>
+<pre><code>- extendedWaitUntil:
+    visible: "Avocado"
+# checkpoint: C1 listed
+- assertVisible: "Avocado"</code></pre></div>
+    <div><div class="good-label">Marker above the wait</div>
+<pre><code># checkpoint: C1 listed
+- extendedWaitUntil:
+    visible: "Avocado"
+- assertVisible: "Avocado"</code></pre></div>
+  </div>
+  <p>The flow checker now rejects the first form. Re-running six fresh sessions with that rule: <strong>6 of 6 proven</strong>. Waits on a screen anchor from the app map stay allowed, because that text is always on the screen.</p>
+  <p><code>proofloop check --fix</code> now makes that move itself. A flow written with the round-1 mistake, plus a bare <code>launchApp</code>, was fixed in code with no agent repair and proven 3 of 3, with the bug caught at its checkpoint. A second rule rejects a checkpoint that only repeats text already checked with no action in between: it cannot fail. It fired on two of six new authors, and each fixed it in one step.</p>
+</section>
+
+<section id="memory">
+  <h2>App maps: memory between sessions</h2>
+  <p>An app map is a markdown file per app: screens with their always-present text (anchors), the actions between them, and notes of four kinds (precondition, rule, lookup, hazard). The idea comes from a talk on agent test memory, where a map like this cut an agent's repeated mistakes from 87 to 0. Here it is used when a test is authored.</p>
+<pre><code>## screen: saved
+anchors: "Routine saved", "Done"
+- tap "Done" -> home
+- rule: "Next start" and the end-settings sentence are one text
+  element; a locator must continue past the first line: "Next start: ....*"</code></pre>
+  <h3>Does the map help?</h3>
+  <p>Sunflower, same criterion, fresh sessions. Seconds from start to a working flow, three trials per arm:</p>
+  <div class="bars" role="img" aria-label="Average authoring time: without map 193 seconds, with map 94 seconds">
+    <div class="bar"><span>No map</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">193 s</span></div>
+    <div class="bar"><span>With map</span><div class="track"><div class="fill map" style="width:48.7%"></div></div><span class="v">94 s</span></div>
+  </div>
+  <p>The map roughly halved time and tool calls (10 to 5) and did not change whether the test was proven.</p>
+  <h3>Does a map that grows help?</h3>
+  <p>On Quiet Hours, one author hit the multi-line text failure and wrote the fix into the map as two lines. Six later authors then wrote a similar test, three with the original map and three with the grown one.</p>
+  <div class="bars" role="img" aria-label="Average time: original map 137 seconds, grown map 93 seconds">
+    <div class="bar"><span>Original map</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">137 s</span></div>
+    <div class="bar"><span>Grown map</span><div class="track"><div class="fill map" style="width:67.9%"></div></div><span class="v">93 s</span></div>
+  </div>
+  <p>All three authors with the original map failed their first run on that quirk. None of the three with the grown map did. The author's flow became a fourth checked-in task.</p>
+  <h3>Does the author need to run the app at all? Does it need a big model?</h3>
+  <p>Same Sunflower criterion, map and checker, three fresh sessions per arm:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Author</th><th>Device</th><th class="num">Proven</th><th class="num">Time each</th><th class="num">Peak context</th></tr></thead>
+    <tbody>
+      <tr><td>Sonnet, one-shot</td><td>none</td><td class="num">3/3</td><td class="num">~21 s</td><td class="num">~77k</td></tr>
+      <tr><td>Sonnet, full loop (earlier round)</td><td>yes</td><td class="num">3/3</td><td class="num">~94 s</td><td class="num">~71k</td></tr>
+      <tr><td>Haiku, full loop</td><td>yes</td><td class="num">3/3</td><td class="num">~3 min</td><td class="num">~85k</td></tr>
+    </tbody>
+  </table></div>
+  <p>With a good app map, a one-shot flow written without running the app was proven every time. The proof gate is what makes that safe: a wrong one-shot flow would be rejected, not merged. The verdict does not depend on the author model, so a cheaper author costs only time. Token counts are read from each session's transcript.</p>
+  <p class="muted">Three trials per arm, one criterion per app: suggestive, not significant. The checker version also differed between the one-shot and Haiku arms.</p>
+</section>
+
+<section id="shelf-life">
+  <h2>Keeping tests proven</h2>
+  <p>A proof is only true for the build it ran on. Each task now keeps a proof history. On 2026-11-23 the three Quiet Hours tests were re-proved on the app's newest build, 31 commits later:</p>
+  <div class="proof" role="group" aria-label="Quiet Hours proof history">
+    <div class="row"><div class="label">Nov 14-17</div><div><span class="pill pass">proven</span> <span class="muted" style="font-size:13.5px">on e4ba3eb, 10/10 each</span></div></div>
+    <div class="row"><div class="label">Nov 23, new build</div><div><span class="pill fail">0 / 10</span> <span class="muted" style="font-size:13.5px">all three. New one-time tip bubbles dim Home and the wizard, so Maestro cannot see the text the flows wait for.</span></div></div>
+    <div class="row"><div class="label">Repair</div><div><span class="muted" style="font-size:13.5px">Optional taps on "Skip|Got it" before the blocked waits. No checkpoint changed. The app's own fix used <code>runFlow</code>, which the allowlist blocks.</span></div></div>
+    <div class="row"><div class="label">Nov 23, re-proof</div><div><span class="pill pass">proven</span> <span class="muted" style="font-size:13.5px">10/10 each. One task first came back 4/10: a wizard tip appeared on only 6 of 10 runs, a race one green run would hide.</span></div></div>
+  </div>
+  <p><code>proofloop history</code> reports this as shelf life: "first proven 2026-11-14 … stopped being proven on 2026-11-23 after 8 days; proven again (flows changed)". <code>proofloop retro</code> names the 0/10 failure a broken setup step, not flakiness.</p>
+  <h3>Real bugs, not just seeded ones</h3>
+  <p><code>proofloop mine-bugs</code> finds fix commits in the app's history. The commit before a fix is a real, unseeded bug build. The one that differs from the good build by that bug alone, a VIP Do Not Disturb bug, is <strong>not caught</strong> by any task, because none exercises VIP calls. That is a measured coverage gap, and it is the next test to write. <code>proofloop from-fix</code> has already scaffolded it from the fix commit.</p>
+</section>
+
+<section id="results">
+  <h2>Results</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Task</th><th>Verdict</th><th class="num">Good runs</th><th class="num">Proof bugs</th><th class="num">Held-out</th></tr></thead>
+    <tbody>
+      <tr><td>quiet-hours / end-restores-sound</td><td><span class="pill pass">proven</span></td><td class="num">10/10</td><td class="num">2/2</td><td class="num">1/2</td></tr>
+      <tr><td>quiet-hours / weekdays-listed</td><td><span class="pill pass">proven</span></td><td class="num">10/10</td><td class="num">1/1</td><td class="num">1/1</td></tr>
+      <tr><td>sunflower / garden-planting</td><td><span class="pill pass">proven</span></td><td class="num">10/10</td><td class="num">1/1</td><td class="num">1/1</td></tr>
+      <tr><td>quiet-hours / next-start-saved-screen</td><td><span class="pill pass">proven</span></td><td class="num">10/10</td><td class="num">1/1</td><td class="num">-</td></tr>
+    </tbody>
+  </table></div>
+  <p>Quiet Hours rows are on the app's newest build (5.3.4), after the tip-bubble repair. Pixel 8 image, Android 14. Flows use text locators only, no coordinate taps. One proof bug and one held-out bug are not hand-written: each is the commit before a real fix. The held-out one, the VIP bug, is the one missed.</p>
+  <p>Spreading good runs over two emulators cut a 10-run proof from 282 s to 200 s.</p>
+  <p><strong>The proof found a real bug.</strong> The Quiet Hours build everyone called good cached its Home status line without the time, so while Home stayed open it kept showing "Next: Today 9:00 AM" through the whole active window. The end-alarm task failed on the good build. It was fixed in the app and verified red then green on the device.</p>
+  <p>"Passed 10/10" bounds the true flake rate below 26% at 95% confidence. Over all 40 runs the bound is about 7%. Neither is zero, and every report says so.</p>
+</section>
+
+<section id="verdicts">
+  <h2>Verdicts</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Verdict</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill pass">proven</span></td><td>Every good run passed; every proof bug failed at its expected checkpoint.</td></tr>
+      <tr><td><span class="pill fail">rejected_flaky</span></td><td>Fewer than the required passes on the good build.</td></tr>
+      <tr><td><span class="pill fail">rejected_missed_bug</span></td><td>A proof bug passed, or failed somewhere else (setup, an action, a crash).</td></tr>
+      <tr><td><span class="pill warn">blocked_environment</span></td><td>Device or Maestro failure. Says nothing about the test.</td></tr>
+      <tr><td><span class="pill warn">blocked_policy</span></td><td>The flow uses a command outside the allowlist.</td></tr>
+      <tr><td><span class="pill info">needs_human</span></td><td>No approval covering the current plan and bug list, checkpoints that differ from the plan, or a flow that cannot be checked.</td></tr>
+      <tr><td><span class="pill info">budget_exhausted</span></td><td>The time budget ran out.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="failed">
+  <h2>What went wrong along the way</h2>
+  <ul>
+    <li>The plan was to build a generator that already existed. Research first found Maestro's own MCP server, and the project became a proof gate instead.</li>
+    <li>The unit tests "failed" 117 times on every build. Android Studio's bundled Java 25 cannot run Mockito. A failure identical on the good build is not a test result.</li>
+    <li>A status check deleted the alarm it was observing: Maestro's <code>launchApp</code> force-stops the app, and Android cancels a force-stopped app's alarms. The checker now requires <code>stopApp: false</code>.</li>
+    <li>A held-out bug escaped because the clock was not pinned. Time-dependent checkpoints need a pinned clock and expected text read from the app.</li>
+    <li>mobile-mcp and Maestro cannot share a device: each holds the only UI-automation connection.</li>
+  </ul>
+  <p>Almost every rejection came from the harness, not from the agent's flows. The full log is in the repo.</p>
+</section>
+
+<section id="use">
+  <h2>Using it</h2>
+  <p>You need Python 3.11+, adb, the Maestro CLI and one emulator or device.</p>
+<pre><code>git clone https://github.com/samir-sayyed/proofloop &amp;&amp; cd proofloop
+pip install -e .
+brew tap mobile-dev-inc/tap &amp;&amp; brew install mobile-dev-inc/tap/maestro
+claude mcp add maestro -- maestro mcp
+cp -R skills/proofloop skills/app-map ~/.claude/skills/
+proofloop doctor</code></pre>
+  <p>In Claude Code, ask for a test in plain language: <em>"Prove a test that a Weekdays schedule shows up on Home."</em> The skill plans checkpoints, asks you to approve, explores, writes the flow, runs the proof, and offers a pull request only if the verdict is <code>proven</code>. Or run the commands yourself:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Command</th><th>Does</th></tr></thead>
+    <tbody>
+      <tr><td><code>proofloop check TASK [--fix]</code></td><td>Check the flows, and fix the mechanical errors. No device needed.</td></tr>
+      <tr><td><code>proofloop approve TASK --by NAME</code></td><td>Bind a human's approval to the plan and bug list.</td></tr>
+      <tr><td><code>proofloop prove TASK [--devices A,B] [--snapshot S]</code></td><td>Run the proof; write the record, report, video and history line.</td></tr>
+      <tr><td><code>proofloop eval DIR</code></td><td>Prove every task: verdicts, repairs, author and tokens.</td></tr>
+      <tr><td><code>proofloop history TASK</code></td><td>Shelf life: every proof, and the build it stopped on.</td></tr>
+      <tr><td><code>proofloop mine-bugs REPO --after GOOD</code></td><td>Real fix commits whose parent is a held-out bug.</td></tr>
+      <tr><td><code>proofloop retro PATHS</code></td><td>Group rejections by cause, with the rule that addresses each.</td></tr>
+      <tr><td><code>proofloop next APP_DIR</code></td><td>Backfill queue: untested map rules, screens, actions.</td></tr>
+      <tr><td><code>proofloop from-fix REPO SHA</code></td><td>Regression task from a fix: good is the fix, bug is its parent.</td></tr>
+      <tr><td><code>proofloop publish RECORD --repo APP</code></td><td>Commit a proven test on a branch; <code>--push</code> opens a PR, at most 3 waiting. Never merges.</td></tr>
+      <tr><td><code>proofloop prepare TASK</code></td><td>Put the device in the start state for exploring.</td></tr>
+      <tr><td><code>proofloop map MAP [FLOWS]</code></td><td>Check an app map and list untested screens.</td></tr>
+      <tr><td><code>proofloop doctor</code></td><td>Check adb, device, Maestro, free space.</td></tr>
+    </tbody>
+  </table></div>
+  <p>A task is a JSON file naming the good build, the seeded-bug builds with the checkpoint each must fail at, the device state (clock, time zone, permissions) and the steps. Sunflower is fully reproducible from the repo. The Quiet Hours tasks are worked examples, because that app's source is not in the repo.</p>
+</section>
+
+<section id="safety">
+  <h2>Safety and limits</h2>
+  <ul>
+    <li>The flow checker blocks scripts, links, nested flows, retries, other apps, force-stops and device-state changes, in code, before any device action.</li>
+    <li>Installs, data clearing, permissions, clock and probes happen in the runner, outside the agent's tools. Screen text is data, never instructions.</li>
+    <li>A human approves the plan and the bug list. If the owner delegates approval in chat, the record says so. Unproven tests never open a normal pull request. ProofLoop never merges.</li>
+    <li>Small suite: 4 tasks, 2 apps, 7 seeded bugs (6 hand-written) and 2 real ones from the app's history.</li>
+    <li>Baselines cover one criterion, three trials per arm. Token cost is measured for Claude Code authors only.</li>
+    <li>One device image and one host: Pixel 8 emulator, Android 14, macOS.</li>
+    <li>No license file yet.</li>
+  </ul>
+</section>
+
+<footer>
+  Source and full docs: <a href="https://github.com/samir-sayyed/proofloop">github.com/samir-sayyed/proofloop</a>. Every number on this page comes from a run record or experiment write-up in that repository.
+</footer>
+</div>
